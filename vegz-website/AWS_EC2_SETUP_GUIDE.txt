@@ -1,0 +1,650 @@
+# ══════════════════════════════════════════════════════════════
+#  VEGZ PRIVATE LIMITED — AWS EC2 COMPLETE SETUP GUIDE
+#  From zero to live production in one document
+#  Time required: ~3 hours
+# ══════════════════════════════════════════════════════════════
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ARCHITECTURE OVERVIEW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Internet → DNS (all domains → Server 1 IP)
+                  ↓
+          ┌───────────────────────────────┐
+          │  SERVER 1 (EC2, Ubuntu 22.04)  │
+          │  Public IP: SERVER1_IP         │
+          │  ─────────────────────────    │
+          │  Nginx (port 80/443)           │
+          │  ├── vegz.online               │  → /var/www/vegz/frontend/index.html
+          │  ├── www.vegz.online           │  → redirect to vegz.online
+          │  ├── farmer.vegz.online        │  → /pages/farmer.html
+          │  ├── admin.vegz.online         │  → /pages/admin.html
+          │  ├── agent.vegz.online         │  → /pages/agent.html
+          │  └── api.vegz.online           │  → proxy → localhost:5001
+          │  Node.js + PM2 (port 5001)     │
+          │  Let's Encrypt SSL (FREE)      │
+          └───────────────┬───────────────┘
+                          │ MySQL :3306
+                          ↓
+          ┌───────────────────────────────┐
+          │  SERVER 2 (EC2, Ubuntu 22.04)  │
+          │  Public IP: SERVER2_IP         │
+          │  ─────────────────────────    │
+          │  MySQL 8.x                     │
+          │  Database: vegz_db             │
+          │  User: vegz_user               │
+          └───────────────────────────────┘
+
+  DOMAINS (all point to Server 1 IP):
+  ┌─────────────────────────────────────────────┐
+  │ vegz.online          Customer website        │
+  │ www.vegz.online      Redirect to vegz.online │
+  │ api.vegz.online      Backend API (Node.js)   │
+  │ admin.vegz.online    Admin dashboard          │
+  │ farmer.vegz.online   Farmer portal            │
+  │ agent.vegz.online    Agent app                │
+  └─────────────────────────────────────────────┘
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PART 1: AWS ACCOUNT SETUP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1.1  Create AWS Account
+     → aws.amazon.com → Create account
+     → Add credit card (free tier available for 1 year)
+     → Enable MFA (very important for security)
+
+1.2  Create SSH Key Pair
+     → AWS Console → EC2 → Key Pairs → Create key pair
+     → Name: vegz-key
+     → Type: RSA
+     → Format: .pem
+     → Download and save as vegz-key.pem
+     → CRITICAL: This file cannot be recovered if lost
+
+     On Mac/Linux, set permissions:
+       chmod 400 vegz-key.pem
+
+1.3  Create Security Groups
+
+     Server 1 Security Group (vegz-web-sg):
+       Inbound rules:
+       ┌──────────┬──────────┬───────────────────────┐
+       │ Type     │ Port     │ Source                 │
+       ├──────────┼──────────┼───────────────────────┤
+       │ SSH      │ 22       │ My IP (your home IP)   │
+       │ HTTP     │ 80       │ 0.0.0.0/0 (everyone)  │
+       │ HTTPS    │ 443      │ 0.0.0.0/0 (everyone)  │
+       └──────────┴──────────┴───────────────────────┘
+
+     Server 2 Security Group (vegz-db-sg):
+       Inbound rules:
+       ┌──────────┬──────────┬───────────────────────┐
+       │ Type     │ Port     │ Source                 │
+       ├──────────┼──────────┼───────────────────────┤
+       │ SSH      │ 22       │ My IP                  │
+       │ MySQL    │ 3306     │ 0.0.0.0/0              │
+       └──────────┴──────────┴───────────────────────┘
+       Note: For extra security, restrict 3306 to Server 1 IP only
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PART 2: LAUNCH EC2 INSTANCES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2.1  Launch Server 1 (Web + API)
+     → EC2 → Launch Instance
+     → Name:             vegz-web-server
+     → AMI:              Ubuntu Server 22.04 LTS (Free tier eligible)
+     → Instance type:    t3.micro (free tier) or t3.small (recommended)
+     → Key pair:         vegz-key
+     → Security group:   vegz-web-sg
+     → Storage:          20 GB gp3
+     → Advanced → Auto-assign public IP: Enable
+
+     After launch: Note the Public IPv4 address → SERVER1_IP
+
+2.2  Launch Server 2 (Database)
+     → EC2 → Launch Instance
+     → Name:             vegz-db-server
+     → AMI:              Ubuntu Server 22.04 LTS
+     → Instance type:    t3.micro
+     → Key pair:         vegz-key
+     → Security group:   vegz-db-sg
+     → Storage:          20 GB gp3
+
+     After launch: Note the Public IPv4 address → SERVER2_IP
+
+2.3  Allocate Elastic IPs (IMPORTANT — prevents IP change on restart)
+     → EC2 → Elastic IPs → Allocate Elastic IP
+     → Do this TWICE (one for each server)
+     → Associate Elastic IP 1 → Server 1
+     → Associate Elastic IP 2 → Server 2
+     → Update SERVER1_IP and SERVER2_IP with Elastic IPs
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PART 3: DNS CONFIGURATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Go to your domain registrar (GoDaddy / Namecheap / Hostinger):
+→ DNS Management → Add these records:
+
+  ┌───────┬────────────┬──────────────────┬───────┐
+  │ Type  │ Name       │ Value            │ TTL   │
+  ├───────┼────────────┼──────────────────┼───────┤
+  │ A     │ @          │ SERVER1_IP       │ 600   │
+  │ A     │ www        │ SERVER1_IP       │ 600   │
+  │ A     │ api        │ SERVER1_IP       │ 600   │
+  │ A     │ admin      │ SERVER1_IP       │ 600   │
+  │ A     │ farmer     │ SERVER1_IP       │ 600   │
+  │ A     │ agent      │ SERVER1_IP       │ 600   │
+  └───────┴────────────┴──────────────────┴───────┘
+
+  Wait 15–30 minutes for DNS propagation.
+
+  Verify propagation:
+    curl https://dnschecker.org/check  (use their website)
+    OR: ping vegz.online  (should return your SERVER1_IP)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PART 4: SERVER 2 — DATABASE SETUP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SSH into Server 2:
+  ssh -i vegz-key.pem ubuntu@SERVER2_IP
+
+--- Run these commands one by one ---
+
+  # System update
+  sudo apt update && sudo apt upgrade -y
+
+  # Install MySQL 8
+  sudo apt install mysql-server -y
+  sudo systemctl enable mysql
+  sudo systemctl start mysql
+
+  # Secure MySQL
+  sudo mysql_secure_installation
+  # Answer: Y to all questions
+  # Set a strong root password
+
+  # Create Vegz database and user
+  sudo mysql -u root -p
+  # Enter the root password you just set
+
+Inside MySQL shell, paste ALL of this:
+
+  CREATE DATABASE vegz_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+  CREATE USER 'vegz_user'@'%' IDENTIFIED BY 'vegz123';
+  GRANT ALL PRIVILEGES ON vegz_db.* TO 'vegz_user'@'%';
+  FLUSH PRIVILEGES;
+  EXIT;
+
+  # Allow remote connections (so Server 1 can connect)
+  sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf
+
+  # Find this line and change it:
+  #   bind-address = 127.0.0.1
+  # Change to:
+  #   bind-address = 0.0.0.0
+
+  sudo systemctl restart mysql
+
+  # Test connection (from Server 2 itself):
+  mysql -u vegz_user -pvegz123 vegz_db -e "SHOW TABLES;"
+  # Should show "Empty set" (no tables yet — that's correct)
+
+  # Exit Server 2
+  exit
+
+--- Upload and run SQL files from your Mac ---
+
+  # From your Mac terminal, in vegz-website/ folder:
+  scp -i vegz-key.pem database/001_create_all_tables.sql ubuntu@SERVER2_IP:/home/ubuntu/
+  scp -i vegz-key.pem database/002_seed_data.sql ubuntu@SERVER2_IP:/home/ubuntu/
+  scp -i vegz-key.pem database/003_farmer_admin_tables.sql ubuntu@SERVER2_IP:/home/ubuntu/
+  scp -i vegz-key.pem database/004_fix_admin_and_new_tables.sql ubuntu@SERVER2_IP:/home/ubuntu/
+
+  # SSH back into Server 2
+  ssh -i vegz-key.pem ubuntu@SERVER2_IP
+
+  # Run SQL files IN ORDER
+  mysql -u vegz_user -pvegz123 vegz_db < /home/ubuntu/001_create_all_tables.sql
+  mysql -u vegz_user -pvegz123 vegz_db < /home/ubuntu/002_seed_data.sql
+  mysql -u vegz_user -pvegz123 vegz_db < /home/ubuntu/003_farmer_admin_tables.sql
+  mysql -u vegz_user -pvegz123 vegz_db < /home/ubuntu/004_fix_admin_and_new_tables.sql
+
+  # Verify — should show 23 tables and 18 products
+  mysql -u vegz_user -pvegz123 vegz_db -e "SHOW TABLES; SELECT COUNT(*) FROM products;"
+
+  exit
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PART 5: SERVER 1 — WEB SERVER SETUP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SSH into Server 1:
+  ssh -i vegz-key.pem ubuntu@SERVER1_IP
+
+--- Install all required software ---
+
+  # System update
+  sudo apt update && sudo apt upgrade -y
+
+  # Install Node.js 20 (LTS)
+  curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+  sudo apt install nodejs -y
+  node --version   # Should show v20.x.x
+  npm --version    # Should show 10.x.x
+
+  # Install Nginx
+  sudo apt install nginx -y
+  sudo systemctl enable nginx
+  sudo systemctl start nginx
+  nginx -v   # Should show nginx/1.x.x
+
+  # Install Certbot (free SSL)
+  sudo apt install certbot python3-certbot-nginx -y
+
+  # Install PM2 (process manager — keeps Node.js running 24/7)
+  sudo npm install -g pm2
+  pm2 --version
+
+  # Test Nginx is running
+  curl http://SERVER1_IP
+  # Should show "Welcome to nginx!" page
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PART 6: UPLOAD PROJECT TO SERVER 1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+From your Mac terminal (in the folder containing vegz-website/):
+
+  # Create web directory
+  ssh -i vegz-key.pem ubuntu@SERVER1_IP "sudo mkdir -p /var/www/vegz && sudo chown ubuntu:ubuntu /var/www/vegz"
+
+  # Upload entire project (this may take 1-2 minutes)
+  scp -i vegz-key.pem -r vegz-website/frontend ubuntu@SERVER1_IP:/var/www/vegz/
+  scp -i vegz-key.pem -r vegz-website/backend  ubuntu@SERVER1_IP:/var/www/vegz/
+
+  # SSH into Server 1
+  ssh -i vegz-key.pem ubuntu@SERVER1_IP
+
+  # Install backend dependencies
+  cd /var/www/vegz/backend
+  npm install --production
+
+  # Verify files are there
+  ls /var/www/vegz/frontend/   # Should show index.html, css/, js/, pages/
+  ls /var/www/vegz/backend/    # Should show package.json, src/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PART 7: CONFIGURE BACKEND .env
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+On Server 1:
+
+  cd /var/www/vegz/backend
+  nano .env
+
+Paste this (replace all CAPS values with real values):
+
+  NODE_ENV=production
+  PORT=5001
+
+  DB_HOST=SERVER2_PUBLIC_IP
+  DB_PORT=3306
+  DB_USER=vegz_user
+  DB_PASSWORD=vegz123
+  DB_NAME=vegz_db
+  DB_CONNECTION_LIMIT=10
+
+  JWT_SECRET=GENERATE_WITH_COMMAND_BELOW
+  JWT_EXPIRES_IN=30d
+
+  OTP_DEV_MODE=false
+  MSG91_AUTH_KEY=your_msg91_key
+  MSG91_TEMPLATE_ID=your_template_id
+  MSG91_SENDER_ID=VEGZPL
+
+  CORS_ORIGINS=https://vegz.online,https://www.vegz.online,https://farmer.vegz.online,https://admin.vegz.online,https://agent.vegz.online
+
+  ORDER_PREFIX=VGZ
+  MIN_ORDER_AMOUNT=500
+  DELIVERY_CHARGE=0
+  AGENT_DELIVERY_EARNING=25
+  AGENT_PICKUP_EARNING=50
+
+Generate JWT_SECRET (run this on Server 1):
+  node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+  # Copy the output → paste as JWT_SECRET in .env
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PART 8: FIX ADMIN + AGENT CREDENTIALS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+On Server 1, from backend folder:
+
+  # Generate bcrypt hash for admin password
+  node -e "require('bcryptjs').hash('Vegz@Admin2025', 12, (e,h) => console.log(h))"
+  # Copy the output hash
+
+  # Generate bcrypt hash for agent password
+  node -e "require('bcryptjs').hash('Agent@123', 12, (e,h) => console.log(h))"
+  # Copy the output hash
+
+  # Update database
+  mysql -h SERVER2_IP -u vegz_user -pvegz123 vegz_db
+
+  # Inside MySQL — paste these with your actual hash values:
+
+  DELETE FROM admin_users WHERE email='admin@vegz.online';
+  INSERT INTO admin_users (name,email,mobile,password_hash,role,is_active)
+  VALUES ('Vegz Admin','admin@vegz.online','+91YOURMOBILE','PASTE_ADMIN_HASH','super_admin',1);
+
+  DELETE FROM agents WHERE 1=1;
+  INSERT INTO agents (name,mobile,password_hash,vehicle_type,zone,is_active)
+  VALUES ('Your Name','+91YOURMOBILE','PASTE_AGENT_HASH','bike','Mundargi',1);
+
+  SELECT id,name,email FROM admin_users;
+  SELECT id,name,mobile FROM agents;
+  EXIT;
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PART 9: START BACKEND WITH PM2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+On Server 1:
+
+  cd /var/www/vegz/backend
+
+  # Test it runs first
+  node src/server.js
+  # Should print:
+  #   ✅ MySQL connected → SERVER2_IP/vegz_db
+  #   🌿  Vegz API running — Port: 5001
+  # Press Ctrl+C to stop
+
+  # Start with PM2 (runs forever)
+  pm2 start src/server.js --name vegz-api
+  pm2 save
+  pm2 startup
+  # Copy and run the command it outputs (starts PM2 on system boot)
+
+  # Check it's running
+  pm2 status
+  # Should show: vegz-api | online | 0 errors
+
+  # Test the API
+  curl http://localhost:5001/health
+  # Should return: {"ok":true,"service":"Vegz API"}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PART 10: CONFIGURE NGINX
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+On Server 1:
+
+  sudo nano /etc/nginx/sites-available/vegz
+
+Paste this complete Nginx config:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# NGINX CONFIG — PASTE THIS EXACTLY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# vegz.online — Main customer website
+server {
+    listen 80;
+    server_name vegz.online www.vegz.online;
+    root /var/www/vegz/frontend;
+    index index.html;
+
+    # Gzip compression (faster page loads)
+    gzip on;
+    gzip_types text/plain text/css application/javascript application/json image/svg+xml;
+    gzip_min_length 1024;
+
+    # Cache static files
+    location ~* \.(css|js|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf)$ {
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # Firebase service worker must not be cached
+    location /firebase-messaging-sw.js {
+        add_header Cache-Control "no-cache, no-store";
+    }
+
+    location / {
+        try_files $uri $uri/ $uri.html /index.html;
+    }
+}
+
+# farmer.vegz.online — Farmer portal
+server {
+    listen 80;
+    server_name farmer.vegz.online;
+    root /var/www/vegz/frontend;
+
+    location / {
+        try_files $uri /pages/farmer.html;
+    }
+}
+
+# admin.vegz.online — Admin dashboard
+server {
+    listen 80;
+    server_name admin.vegz.online;
+    root /var/www/vegz/frontend;
+
+    # Security headers
+    add_header X-Robots-Tag "noindex, nofollow" always;
+    add_header X-Frame-Options "DENY" always;
+    add_header X-Content-Type-Options "nosniff" always;
+
+    location / {
+        try_files $uri /pages/admin.html;
+    }
+}
+
+# agent.vegz.online — Agent app
+server {
+    listen 80;
+    server_name agent.vegz.online;
+    root /var/www/vegz/frontend;
+
+    location / {
+        try_files $uri /pages/agent.html;
+    }
+}
+
+# api.vegz.online — Backend API (proxy to Node.js)
+server {
+    listen 80;
+    server_name api.vegz.online;
+    client_max_body_size 10M;
+
+    location / {
+        proxy_pass         http://127.0.0.1:5001;
+        proxy_http_version 1.1;
+        proxy_set_header   Upgrade $http_upgrade;
+        proxy_set_header   Connection 'upgrade';
+        proxy_set_header   Host $host;
+        proxy_set_header   X-Real-IP $remote_addr;
+        proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_read_timeout 60s;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  # Enable the site
+  sudo ln -s /etc/nginx/sites-available/vegz /etc/nginx/sites-enabled/
+  sudo rm -f /etc/nginx/sites-enabled/default
+
+  # Test Nginx config (MUST pass before continuing)
+  sudo nginx -t
+  # Should say: syntax is ok, test is successful
+
+  # Reload Nginx
+  sudo systemctl reload nginx
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PART 11: SSL CERTIFICATES (FREE HTTPS)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+IMPORTANT: DNS must be propagated first! Test with:
+  curl -v http://vegz.online   # Should reach your server, not get NXDOMAIN
+
+On Server 1:
+
+  sudo certbot --nginx \
+    -d vegz.online \
+    -d www.vegz.online \
+    -d api.vegz.online \
+    -d admin.vegz.online \
+    -d farmer.vegz.online \
+    -d agent.vegz.online \
+    --email hello@vegz.online \
+    --agree-tos \
+    --non-interactive
+
+  # Wait ~1 minute for certificates to be issued
+  # Certbot automatically updates Nginx config with SSL
+
+  # Reload Nginx
+  sudo systemctl reload nginx
+
+  # Verify SSL works
+  curl https://api.vegz.online/health
+  # Should return: {"ok":true,"service":"Vegz API"}
+
+  # Check SSL renewal is scheduled (auto-renews every 90 days)
+  sudo certbot renew --dry-run
+  # Should say: Congratulations, all renewals succeeded
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PART 12: FINAL VERIFICATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Run all these checks — each should succeed:
+
+  curl https://api.vegz.online/health
+  # → {"ok":true,"service":"Vegz API","env":"production"}
+
+  curl https://api.vegz.online/api/v1/products | head -100
+  # → JSON with 18 vegetables
+
+  curl -X POST https://api.vegz.online/api/v1/admin/auth/login \
+    -H "Content-Type: application/json" \
+    -d '{"email":"admin@vegz.online","password":"Vegz@Admin2025"}'
+  # → {"success":true,"token":"..."}
+
+  pm2 status
+  # → vegz-api | online | uptime: Xm
+
+  sudo systemctl status nginx
+  # → active (running)
+
+  Open in browser:
+  ✅ https://vegz.online            (customer landing page)
+  ✅ https://farmer.vegz.online     (farmer portal)
+  ✅ https://admin.vegz.online      (admin login page)
+  ✅ https://agent.vegz.online      (agent login page)
+  ✅ https://api.vegz.online/health (API health check)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PART 13: MONTHLY MAINTENANCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  # Check server health (run weekly)
+  pm2 status
+  sudo systemctl status nginx
+  df -h    # Check disk usage (should be < 80%)
+  free -h  # Check RAM usage
+
+  # View backend logs (if something breaks)
+  pm2 logs vegz-api --lines 50
+
+  # View Nginx error logs
+  sudo tail -50 /var/log/nginx/error.log
+
+  # Update code after making changes:
+  # 1. Upload new files from Mac:
+  scp -i vegz-key.pem -r frontend/ ubuntu@SERVER1_IP:/var/www/vegz/frontend/
+  scp -i vegz-key.pem backend/src/ ubuntu@SERVER1_IP:/var/www/vegz/backend/src/
+
+  # 2. Restart backend:
+  pm2 restart vegz-api
+
+  # 3. Reload Nginx (only if Nginx config changed):
+  sudo nginx -t && sudo systemctl reload nginx
+
+  # Clean old OTP sessions monthly (frees DB space):
+  mysql -h SERVER2_IP -u vegz_user -pvegz123 vegz_db
+  DELETE FROM otp_sessions WHERE created_at < DATE_SUB(NOW(), INTERVAL 30 DAY);
+  DELETE FROM agent_locations WHERE recorded_at < DATE_SUB(NOW(), INTERVAL 7 DAY);
+  EXIT;
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ESTIMATED AWS COSTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Year 1 (Free tier):
+  ┌────────────────────────────────────────────────┐
+  │ EC2 t3.micro × 2    $0    (750 hrs/month free) │
+  │ 40 GB storage       $0    (30 GB free tier)    │
+  │ Data transfer       ~$2   (15 GB free/month)   │
+  │ Elastic IPs         $0    (1 free if attached)  │
+  │ Let's Encrypt SSL   $0    (always free)         │
+  │ TOTAL YEAR 1        ~$2/month                  │
+  └────────────────────────────────────────────────┘
+
+  Year 2+ (no free tier):
+  ┌────────────────────────────────────────────────┐
+  │ EC2 t3.micro × 2    ~$20  ($10/server/month)   │
+  │ 40 GB gp3 storage   ~$3                        │
+  │ Data transfer       ~$2                        │
+  │ TOTAL YEAR 2+       ~$25/month                 │
+  └────────────────────────────────────────────────┘
+
+  Upgrade to t3.small if: CPU usage consistently > 70%
+  Upgrade to t3.medium if: RAM usage consistently > 80%
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  COMMON ERRORS AND FIXES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Error: "502 Bad Gateway"
+  Fix:   Backend crashed. Run: pm2 restart vegz-api
+         Then check: pm2 logs vegz-api
+
+  Error: "Invalid credentials" on admin login
+  Fix:   Hash mismatch. Run setup-credentials.js again.
+         Check: SELECT email, LEFT(password_hash,20) FROM admin_users;
+
+  Error: "Not found" on agent login
+  Fix:   Mobile not in DB. Check:
+         SELECT id,name,mobile FROM agents;
+         Make sure you enter digits only (no +91) in app.
+
+  Error: MySQL connection refused
+  Fix:   Check Server 2 is running.
+         Check bind-address=0.0.0.0 in mysqld.cnf
+         Check security group allows port 3306
+
+  Error: CORS error in browser console
+  Fix:   Add the domain to CORS_ORIGINS in .env
+         Then: pm2 restart vegz-api
+
+  Error: SSL certificate expired
+  Fix:   sudo certbot renew --force-renewal
+         sudo systemctl reload nginx
+
+  Error: "No space left on device"
+  Fix:   df -h  (check disk)
+         sudo journalctl --vacuum-time=7d  (clean logs)
+         AWS Console → Volumes → Modify → increase size

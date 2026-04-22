@@ -1,0 +1,174 @@
+# ══════════════════════════════════════════════════════════
+#  VEGZ PRIVATE LIMITED — MASTER CREDENTIALS FILE
+#  ⚠️  KEEP THIS FILE PRIVATE — NEVER COMMIT TO GIT
+#  ⚠️  NEVER SHARE WITH ANYONE OUTSIDE THE COMPANY
+#  Last updated: April 2026
+# ══════════════════════════════════════════════════════════
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ADMIN DASHBOARD  →  admin.vegz.online
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  URL:      https://admin.vegz.online
+  Email:    admin@vegz.online
+  Password: Vegz@Admin2025
+  Role:     Super Admin (full access)
+  Note:     JWT token expires every 12 hours — login again each day
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  DATABASE — MySQL 8.x  (EC2 Server 2)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Host:       SERVER2_PUBLIC_IP   (replace with actual IP)
+  Port:       3306
+  Database:   vegz_db
+  User:       vegz_user
+  Password:   vegz123             ← CHANGE THIS before launch
+  Root user:  root
+  Root pass:  (set during MySQL install)
+
+  Connect command:
+    mysql -h SERVER2_IP -u vegz_user -pvegz123 vegz_db
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  BACKEND API  →  api.vegz.online
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  URL:        https://api.vegz.online
+  Port:       5001
+  JWT Secret: (see .env file — generate with command below)
+  OTP Dev:    123456  (only in development mode)
+
+  Generate JWT Secret:
+    node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  AGENT APP  →  agent.vegz.online
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  URL:              https://agent.vegz.online
+  Default Password: Agent@123   (for all agents)
+  Login:            Mobile number + password
+
+  Current Agents:
+  ┌─────────────────────────────────────────────────┐
+  │ Name          Mobile         Zone      Password  │
+  │ ─────────────────────────────────────────────── │
+  │ [Your Name]   [Your Mobile]  Mundargi  Agent@123 │
+  │ Add more agents via MySQL (see README)            │
+  └─────────────────────────────────────────────────┘
+
+  Add new agent:
+    1. node -e "require('bcryptjs').hash('Agent@123',12,(_,h)=>console.log(h))"
+    2. Copy hash → INSERT INTO agents ...
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  AWS EC2 SERVERS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Server 1 (Web + API):
+    Public IP:  SERVER1_PUBLIC_IP   ← fill this in
+    SSH:        ssh -i vegz-key.pem ubuntu@SERVER1_IP
+    Services:   Nginx, Node.js (PM2), Frontend files
+
+  Server 2 (Database):
+    Public IP:  SERVER2_PUBLIC_IP   ← fill this in
+    SSH:        ssh -i vegz-key.pem ubuntu@SERVER2_IP
+    Services:   MySQL 8.x
+
+  SSH Key file: vegz-key.pem  (keep safe — cannot recover if lost)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  DOMAIN  →  vegz.online  (Hostinger / GoDaddy)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Registrar:   [Your registrar]
+  Login URL:   [Your registrar login URL]
+  Email:       [Your registrar email]
+  Password:    [Your registrar password]
+
+  DNS Records (all → Server 1 IP):
+    A    @          SERVER1_IP
+    A    www        SERVER1_IP
+    A    api        SERVER1_IP
+    A    admin      SERVER1_IP
+    A    farmer     SERVER1_IP
+    A    agent      SERVER1_IP
+
+  SSL:  Let's Encrypt via Certbot (FREE — auto-renews)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  MSG91 — OTP SMS SERVICE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Website:     msg91.com
+  Email:       [Your email]
+  Auth Key:    [Your MSG91 auth key]         ← add after KYC
+  Template ID: [Your OTP template ID]        ← add after DLT
+  Cost:        ~₹0.20 per SMS
+  DLT Header:  VEGZPL  (register on TRAI portal)
+
+  Template text:
+    "Your Vegz OTP is ##OTP##. Valid 10 minutes.
+     Do not share. -Vegz Private Ltd"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  RAZORPAY — PAYMENT GATEWAY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Website:        razorpay.com
+  Email:          [Your email]
+  Key ID:         rzp_live_XXXXXXXXXX    ← add after KYC
+  Key Secret:     XXXXXXXXXXXXXXXXXX     ← add after KYC
+  Webhook Secret: XXXXXXXXXXXXXXXXXX     ← add after setup
+  Fee:            2% per transaction
+  Test Key ID:    rzp_test_XXXXXXXXXX    ← use during development
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  FIREBASE — PUSH NOTIFICATIONS (FREE)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Console:         console.firebase.google.com
+  Project:         vegz-notifications
+  Google Account:  [Your Gmail]
+  Server Key:      [FCM Server Key]       ← from Firebase Console
+  Sender ID:       [Sender ID]            ← from Firebase Console
+  VAPID Key:       [Web Push Cert Key]    ← for web push
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  WEBSITE URLS — QUICK REFERENCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Customer site:   https://vegz.online
+  Farmer portal:   https://farmer.vegz.online
+  Agent app:       https://agent.vegz.online
+  Admin dashboard: https://admin.vegz.online
+  Backend API:     https://api.vegz.online
+  API Health:      https://api.vegz.online/health
+
+  LOCAL DEVELOPMENT:
+  Frontend:        http://127.0.0.1:5500
+  Backend API:     http://localhost:5001
+  API Health:      http://localhost:5001/health
+  Admin (local):   http://127.0.0.1:5500/frontend/pages/admin.html
+  Agent (local):   http://127.0.0.1:5500/frontend/pages/agent.html
+  Farmer (local):  http://127.0.0.1:5500/frontend/pages/farmer.html
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  USEFUL COMMANDS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Backend start (local):      npm run dev
+  Backend start (production):  pm2 start src/server.js --name vegz-api
+  Restart backend:             pm2 restart vegz-api
+  View backend logs:           pm2 logs vegz-api
+  MySQL local login:           mysql -u vegz_user -pvegz123 vegz_db
+  Check all agents:            SELECT id,name,mobile,zone FROM agents;
+  Reset agent password:        (see README — run setup-credentials.js)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  BUSINESS DETAILS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Company:   Vegz Private Limited
+  Address:   Mundargi, Gadag District, Karnataka 582118
+  Email:     hello@vegz.online
+  Phone:     +91-XXXXXXXXXX   ← add your number
+  GST:       [Your GST number]
+  CIN:       [Your company registration number]
+
+# ══════════════════════════════════════════════════════════
+#  CHANGE LOG
+# ══════════════════════════════════════════════════════════
+#  Date          What changed                  Changed by
+#  2026-04-21    Initial setup                 Manoj H
+#
+# ══════════════════════════════════════════════════════════

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile — Vegz</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/main.css">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="shop-body">
+<header class="header"><div class="header-inner">
+  <a href="shop.html" class="logo"><span>🌿</span><span class="logo-text">VEGZ</span></a>
+  <div style="margin-left:auto;display:flex;gap:12px;align-items:center">
+    <a href="orders.html" style="font-size:14px;color:var(--g5);font-weight:600">My Orders</a>
+    <a href="shop.html" style="font-size:14px;color:var(--g5);font-weight:600">← Shop</a>
+    <button onclick="logout()" class="btn-secondary" style="font-size:13px;padding:6px 14px">Logout</button>
+  </div>
+</div></header>
+
+<div style="max-width:560px;margin:48px auto;padding:0 24px">
+  <h2 style="font-family:var(--display);font-size:32px;font-weight:700;color:var(--ink);margin-bottom:8px">My Profile</h2>
+  <p style="font-size:14px;color:var(--g5);margin-bottom:32px">Manage your business details</p>
+
+  <div style="background:var(--white);border:1px solid var(--g2);border-radius:20px;padding:32px" id="profile-card">
+    <div style="text-align:center;padding:24px 0;color:var(--g4)">Loading…</div>
+  </div>
+</div>
+
+<div id="toasts" class="toast-wrap"></div>
+<script src="../js/config.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script>
+if(!requireAuth()){}
+async function load(){
+  const card=document.getElementById('profile-card');
+  try{
+    const user=getUser();
+    card.innerHTML=`
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--g2)">
+        <div style="width:64px;height:64px;border-radius:50%;background:var(--g50);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">👤</div>
+        <div>
+          <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--ink)">${user?.name||'Set your name'}</div>
+          <div style="font-size:14px;color:var(--g5)">${user?.mobile||''}</div>
+        </div>
+      </div>
+      <form onsubmit="saveProfile(event)">
+        <div class="fgroup"><label>Full Name</label><input type="text" id="p-name" value="${user?.name||''}" placeholder="Your name"></div>
+        <div class="fgroup"><label>Business Name</label><input type="text" id="p-biz" value="${user?.businessName||''}" placeholder="Hotel / restaurant name"></div>
+        <div class="fgroup"><label>Business Type</label>
+          <select id="p-type">
+            <option value="">Select type</option>
+            <option value="hotel" ${user?.businessType==='hotel'?'selected':''}>Hotel / Lodge</option>
+            <option value="restaurant" ${user?.businessType==='restaurant'?'selected':''}>Restaurant / Dhaba</option>
+            <option value="caterer" ${user?.businessType==='caterer'?'selected':''}>Caterer</option>
+            <option value="pg" ${user?.businessType==='pg'?'selected':''}>PG / Mess</option>
+            <option value="bakery" ${user?.businessType==='bakery'?'selected':''}>Bakery / Sweet Shop</option>
+            <option value="trader" ${user?.businessType==='trader'?'selected':''}>Vegetable Trader</option>
+            <option value="other" ${user?.businessType==='other'?'selected':''}>Other</option>
+          </select>
+        </div>
+        <div class="fgroup"><label>Email <span style="font-size:11px;color:var(--g4)">(optional)</span></label><input type="email" id="p-email" value="${user?.email||''}" placeholder="your@email.com"></div>
+        <div class="fgroup"><label>Mobile Number</label><input type="text" value="${user?.mobile||''}" disabled style="background:var(--g1);color:var(--g5);cursor:not-allowed"></div>
+        <button type="submit" class="btn-place" style="margin-top:8px">Save Profile</button>
+      </form>`;
+  }catch(e){card.innerHTML=`<p style="color:var(--r600)">⚠️ ${e.message}</p>`}
+}
+async function saveProfile(e){
+  e.preventDefault();
+  const btn=e.target.querySelector('button[type=submit]');
+  btn.disabled=true;btn.textContent='Saving…';
+  try{
+    await API.updateProfile({
+      name:document.getElementById('p-name').value,
+      businessName:document.getElementById('p-biz').value,
+      businessType:document.getElementById('p-type').value,
+      email:document.getElementById('p-email').value,
+    });
+    // Update local storage
+    const u=getUser();
+    if(u){u.name=document.getElementById('p-name').value;u.businessName=document.getElementById('p-biz').value;localStorage.setItem('vegz_user',JSON.stringify(u));}
+    toast('Profile saved!','success');
+  }catch(err){toast(err.message,'error');}
+  btn.disabled=false;btn.textContent='Save Profile';
+}
+load();
+</script>
+</body>
+</html>

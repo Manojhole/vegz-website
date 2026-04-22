@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Placed! — Vegz</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../css/main.css">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="shop-body">
+<header class="header"><div class="header-inner">
+  <a href="shop.html" class="logo"><span class="logo-mark">🌿</span><span class="logo-text">VEGZ</span></a>
+</div></header>
+
+<div class="success-wrap">
+  <div class="success-box">
+    <div class="success-circle">🎉</div>
+    <h2 style="font-family:var(--display);font-size:28px;font-weight:800;color:var(--ink);margin-bottom:8px">Order Placed!</h2>
+    <p style="color:var(--g5);font-size:15px;margin-bottom:20px">Your order has been received. We'll deliver fresh vegetables to your kitchen.</p>
+
+    <div class="success-detail">
+      <div class="sd-row"><span class="sd-label">Order Number</span><span class="sd-val" id="s-num">—</span></div>
+      <div class="sd-row"><span class="sd-label">Total Amount</span><span class="sd-val" id="s-amt">—</span></div>
+      <div class="sd-row"><span class="sd-label">Payment</span><span class="sd-val" id="s-pay">—</span></div>
+      <div class="sd-row"><span class="sd-label">Status</span><span class="sd-val" style="color:var(--g600)">✅ Confirmed</span></div>
+    </div>
+
+    <p style="font-size:13px;color:var(--g5);line-height:1.7;margin-bottom:24px">
+      📞 Our team will call to confirm delivery time. Fresh vegetables are on the way!
+    </p>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <a href="orders.html" class="btn-primary" style="justify-content:center;padding:14px;font-size:15px;border-radius:12px">View My Orders</a>
+      <a href="shop.html" class="btn-secondary" style="justify-content:center;padding:14px;font-size:15px">Continue Shopping</a>
+    </div>
+  </div>
+</div>
+
+<script src="../js/config.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script>
+lucide.createIcons();
+const o = JSON.parse(sessionStorage.getItem('vegz_last_order')||'{}');
+document.getElementById('s-num').textContent = o.orderNumber || '—';
+document.getElementById('s-amt').textContent = o.totalAmount ? `₹${Number(o.totalAmount).toLocaleString('en-IN')}` : '—';
+document.getElementById('s-pay').textContent = o.paymentMethod?.toUpperCase() || '—';
+</script>
+</body>
+</html>

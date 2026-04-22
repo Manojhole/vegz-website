@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vegz Admin — Dashboard</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#16a34a;--g2:#22c55e;--g3:#4ade80;--g4:#dcfce7;--g5:#f0fdf4;
+  --a:#d97706;--a2:#fef3c7;
+  --r:#dc2626;--r2:#fee2e2;
+  --b:#2563eb;--b2:#dbeafe;
+  --ink:#0f172a;--ink2:#1e293b;--ink3:#334155;
+  --muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--white:#fff;
+  --serif:'Instrument Serif',serif;--sans:'Plus Jakarta Sans',sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+html{height:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100%;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+button{cursor:pointer;font-family:var(--sans);border:none;background:none}
+input,select{font-family:var(--sans)}
+a{color:inherit;text-decoration:none}
+
+/* ── LOGIN PAGE ── */
+.login-page{flex:1;display:flex;align-items:center;justify-content:center;background:var(--ink2);min-height:100vh;padding:16px}
+.login-box{background:var(--white);border-radius:24px;padding:48px 40px;width:100%;max-width:400px;box-shadow:0 32px 80px rgba(0,0,0,.25)}
+.login-logo{font-family:var(--serif);font-size:28px;color:var(--g);margin-bottom:8px}
+.login-badge{display:inline-block;background:var(--a2);color:var(--a);font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;margin-bottom:24px}
+.login-title{font-family:var(--serif);font-size:26px;color:var(--ink);margin-bottom:6px}
+.login-sub{font-size:14px;color:var(--muted);margin-bottom:28px}
+.fl{margin-bottom:16px}
+.fl label{display:block;font-size:13px;font-weight:600;color:var(--ink3);margin-bottom:6px}
+.fl input{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;outline:none;transition:.2s}
+.fl input:focus{border-color:var(--g)}
+.btn-login-submit{width:100%;background:var(--g);color:#fff;padding:14px;border-radius:10px;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s;cursor:pointer}
+.btn-login-submit:hover{background:#15803d}
+.login-err{font-size:13px;color:var(--r);margin-top:8px;min-height:20px}
+
+/* ── APP LAYOUT ── */
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{width:240px;background:var(--ink2);display:flex;flex-direction:column;flex-shrink:0;transition:width .3s}
+.sidebar.collapsed{width:60px}
+.sb-logo{padding:20px 20px 16px;font-family:var(--serif);font-size:20px;color:#fff;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sb-logo-icon{font-size:22px;flex-shrink:0}
+.sb-logo-text{white-space:nowrap;overflow:hidden}
+.sb-badge{font-size:9px;background:var(--a2);color:var(--a);padding:2px 7px;border-radius:999px;font-weight:700;margin-top:2px;white-space:nowrap}
+.sb-nav{flex:1;padding:12px 8px;overflow-y:auto}
+.sb-section{font-size:10px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:1.5px;text-transform:uppercase;padding:12px 12px 6px;white-space:nowrap;overflow:hidden}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:rgba(255,255,255,.6);font-size:13px;font-weight:600;cursor:pointer;transition:.2s;margin-bottom:2px;white-space:nowrap}
+.nav-item:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav-item.active{background:var(--g);color:#fff}
+.nav-icon{font-size:18px;flex-shrink:0;width:20px;text-align:center}
+.nav-badge{background:var(--r);color:#fff;font-size:10px;font-weight:800;padding:1px 7px;border-radius:999px;margin-left:auto}
+.sb-bottom{padding:12px;border-top:1px solid rgba(255,255,255,.08)}
+.sb-user{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:rgba(255,255,255,.5);font-size:13px;white-space:nowrap;overflow:hidden}
+.sb-user-avatar{width:32px;height:32px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;color:#fff;font-weight:700}
+
+/* ── MAIN CONTENT ── */
+.main-content{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.top-bar{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;height:60px;display:flex;align-items:center;gap:16px;flex-shrink:0;position:sticky;top:0;z-index:50}
+.top-bar-title{font-family:var(--serif);font-size:20px;color:var(--ink);font-weight:700}
+.tb-right{margin-left:auto;display:flex;gap:10px;align-items:center}
+.notif-btn{position:relative;width:36px;height:36px;border-radius:8px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;transition:.2s}
+.notif-btn:hover{background:var(--border)}
+.notif-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--r);border:2px solid var(--white)}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:6px 12px}
+.search-box input{border:none;outline:none;background:none;font-size:13px;width:200px}
+.content-area{padding:24px 28px;flex:1}
+
+/* ── VIEWS ── */
+.view{display:none}
+.view.active{display:block}
+
+/* ── STATS CARDS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:20px;transition:.2s}
+.stat-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.06);transform:translateY(-2px)}
+.sc-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.sc-val{font-family:var(--serif);font-size:32px;color:var(--ink);line-height:1;margin-bottom:4px}
+.sc-sub{font-size:12px;color:var(--muted)}
+.sc-icon{float:right;font-size:28px;margin-top:-4px}
+.sc-green .sc-val{color:var(--g)}
+.sc-amber .sc-val{color:var(--a)}
+.sc-red   .sc-val{color:var(--r)}
+.sc-blue  .sc-val{color:var(--b)}
+
+/* ── SECTION HEADER ── */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sec-hdr h3{font-family:var(--serif);font-size:18px;color:var(--ink)}
+.sec-hdr-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+/* ── FILTERS ── */
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.fbtn{padding:6px 14px;border:1.5px solid var(--border);border-radius:999px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:.2s;background:var(--white)}
+.fbtn:hover{border-color:var(--g);color:var(--g)}
+.fbtn.active{border-color:var(--g);background:var(--g5);color:var(--g)}
+.filter-select{padding:6px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--ink3);outline:none;background:var(--white)}
+.filter-input{padding:6px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--ink3);outline:none;background:var(--white)}
+.filter-input:focus,.filter-select:focus{border-color:var(--g)}
+
+/* ── TABLE ── */
+.table-wrap{background:var(--white);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{background:#f8fafc;padding:12px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+.tbl td{padding:12px 16px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:#f8fafc}
+.tbl-empty{text-align:center;padding:48px;color:var(--muted);font-size:14px}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700}
+.b-placed    {background:#eff6ff;color:#1d4ed8}
+.b-confirmed {background:var(--a2);color:var(--a)}
+.b-processing{background:#faf5ff;color:#7c3aed}
+.b-out       {background:#ecfdf5;color:#059669}
+.b-delivered {background:var(--g4);color:var(--g)}
+.b-cancelled {background:var(--r2);color:var(--r)}
+.b-pending   {background:var(--a2);color:var(--a)}
+.b-collected {background:var(--g4);color:var(--g)}
+.b-paid      {background:#dbeafe;color:#1e40af}
+
+/* ── ACTION BTNS ── */
+.btn-sm{padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:4px}
+.btn-green{background:var(--g4);color:var(--g);border:1px solid #86efac}
+.btn-green:hover{background:var(--g);color:#fff}
+.btn-blue{background:var(--b2);color:var(--b);border:1px solid #93c5fd}
+.btn-blue:hover{background:var(--b);color:#fff}
+.btn-red{background:var(--r2);color:var(--r);border:1px solid #fca5a5}
+.btn-red:hover{background:var(--r);color:#fff}
+.btn-amber{background:var(--a2);color:var(--a);border:1px solid #fcd34d}
+.btn-primary{background:var(--g);color:#fff;border:none}
+.btn-primary:hover{background:#15803d}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;visibility:hidden;transition:.3s}
+.overlay.open{opacity:1;visibility:visible}
+.modal{background:var(--white);border-radius:20px;padding:28px;max-width:600px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.2);transform:translateY(20px);transition:transform .3s var(--ease)}
+.overlay.open .modal{transform:translateY(0)}
+.modal-title{font-family:var(--serif);font-size:22px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.detail-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:13px}
+.detail-row:last-child{border-bottom:none}
+.dr-label{color:var(--muted);font-weight:500}
+.dr-val{font-weight:600;color:var(--ink3);text-align:right;max-width:60%}
+.status-select{padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;outline:none;width:100%;transition:.2s}
+.status-select:focus{border-color:var(--g)}
+
+/* ── NOTIFICATION PANEL ── */
+.notif-panel{position:fixed;top:60px;right:16px;width:360px;background:var(--white);border:1px solid var(--border);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.12);z-index:100;max-height:500px;overflow-y:auto;display:none}
+.notif-panel.open{display:block}
+.np-header{padding:16px 20px;border-bottom:1px solid var(--border);font-weight:700;font-size:14px}
+.notif-item{padding:14px 20px;border-bottom:1px solid #f1f5f9;cursor:pointer;transition:.15s}
+.notif-item:hover{background:#f8fafc}
+.ni-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.ni-body{font-size:12px;color:var(--muted);line-height:1.5}
+.ni-time{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* ── SPINNER / LOADING ── */
+.spin{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:rot .7s linear infinite;display:inline-block}
+.loading{text-align:center;padding:40px;color:var(--muted)}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ── TOAST ── */
+.toast-wrap{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:8px}
+.toast{display:flex;align-items:center;gap:10px;padding:12px 20px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,.15);animation:sup .3s var(--ease);max-width:300px}
+.toast.success{background:var(--g);color:#fff}
+.toast.error{background:var(--r);color:#fff}
+.toast.info{background:var(--ink2);color:#fff}
+@keyframes sup{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+@media(max-width:768px){
+  .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:100;transform:translateX(-100%);transition:transform .3s}
+  .sidebar.mob-open{transform:translateX(0)}
+  .main-content{width:100%}
+  .top-bar{padding:0 16px}
+  .content-area{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN PAGE ══ -->
+<div id="login-page" class="login-page">
+  <div class="login-box">
+    <div class="login-logo">🌿 VEGZ</div>
+    <div class="login-badge">🔐 Admin Access Only</div>
+    <h2 class="login-title">Admin Dashboard</h2>
+    <p class="login-sub">Login with your admin credentials. This page is not for customers or farmers.</p>
+    <div class="fl">
+      <label>Admin Email</label>
+      <input type="email" id="login-email" placeholder="admin@vegz.online" onkeypress="if(event.key==='Enter')adminLogin()">
+    </div>
+    <div class="fl">
+      <label>Password</label>
+      <input type="password" id="login-pass" placeholder="Your admin password" onkeypress="if(event.key==='Enter')adminLogin()">
+    </div>
+    <div class="login-err" id="login-err"></div>
+    <button class="btn-login-submit" id="btn-admin-login" onclick="adminLogin()">
+      <span>Login to Dashboard</span><span>→</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══ ADMIN APP ══ -->
+<div class="app" id="admin-app" style="display:none">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-logo">
+      <span class="sb-logo-icon">🌿</span>
+      <div class="sb-logo-text">
+        <div style="font-size:18px;color:#fff">VEGZ</div>
+        <div class="sb-badge">Admin</div>
+      </div>
+    </div>
+
+    <nav class="sb-nav">
+      <div class="sb-section">Main</div>
+      <div class="nav-item active" onclick="showView('dashboard')"><span class="nav-icon">📊</span><span>Dashboard</span></div>
+
+      <div class="sb-section">Orders</div>
+      <div class="nav-item" onclick="showView('orders-pending')"><span class="nav-icon">⏳</span><span>Pending Orders</span><span class="nav-badge" id="nb-pending">0</span></div>
+      <div class="nav-item" onclick="showView('orders-active')"><span class="nav-icon">🚚</span><span>Active Orders</span></div>
+      <div class="nav-item" onclick="showView('orders-completed')"><span class="nav-icon">✅</span><span>Completed Orders</span></div>
+      <div class="nav-item" onclick="showView('orders-all')"><span class="nav-icon">📋</span><span>All Orders</span></div>
+
+      <div class="sb-section">Farmers</div>
+      <div class="nav-item" onclick="showView('farmer-pending')"><span class="nav-icon">🌾</span><span>Pending Collection</span><span class="nav-badge" id="nb-farmer">0</span></div>
+      <div class="nav-item" onclick="showView('farmer-completed')"><span class="nav-icon">🏭</span><span>Collected</span></div>
+      <div class="nav-item" onclick="showView('farmer-all')"><span class="nav-icon">📑</span><span>All Listings</span></div>
+
+      <div class="sb-section">Customers</div>
+      <div class="nav-item" onclick="showView('users')"><span class="nav-icon">👥</span><span>All Customers</span></div>
+    </nav>
+
+    <div class="sb-bottom">
+      <div class="sb-user">
+        <div class="sb-user-avatar" id="sb-admin-initial">A</div>
+        <div style="overflow:hidden">
+          <div style="font-size:13px;color:rgba(255,255,255,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="sb-admin-name">Admin</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.4)">Super Admin</div>
+        </div>
+      </div>
+      <div class="nav-item" onclick="adminLogout()" style="margin-top:4px"><span class="nav-icon">🚪</span><span>Logout</span></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-content">
+    <!-- TOP BAR -->
+    <div class="top-bar">
+      <button onclick="document.getElementById('sidebar').classList.toggle('mob-open')" style="display:none;font-size:22px;padding:4px" id="mob-menu-btn">☰</button>
+      <div class="top-bar-title" id="page-title">Dashboard</div>
+      <div class="tb-right">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" id="global-search" placeholder="Search orders, users…" oninput="globalSearch(this.value)">
+        </div>
+        <div class="notif-btn" onclick="toggleNotif()" title="Notifications">
+          🔔
+          <div class="notif-dot" id="notif-dot" style="display:none"></div>
+        </div>
+        <div style="font-size:13px;color:var(--muted);" id="last-refresh">—</div>
+        <button onclick="refreshCurrent()" style="font-size:13px;font-weight:600;color:var(--g);padding:6px 12px;border:1px solid var(--g4);border-radius:8px;background:var(--g5)">↻ Refresh</button>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS PANEL -->
+    <div class="notif-panel" id="notif-panel">
+      <div class="np-header">🔔 Notifications</div>
+      <div id="notif-list"><div class="notif-item"><div class="ni-body">Loading…</div></div></div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content-area">
+
+      <!-- ── DASHBOARD VIEW ── -->
+      <div class="view active" id="view-dashboard">
+        <div class="stats-grid" id="stats-grid">
+          <div class="stat-card sc-green"><div class="sc-icon">📦</div><div class="sc-label">Today's Orders</div><div class="sc-val" id="st-orders">—</div><div class="sc-sub">New orders today</div></div>
+          <div class="stat-card sc-amber"><div class="sc-icon">⏳</div><div class="sc-label">Pending</div><div class="sc-val" id="st-pending">—</div><div class="sc-sub">Need attention</div></div>
+          <div class="stat-card sc-blue"><div class="sc-icon">✅</div><div class="sc-label">Delivered Today</div><div class="sc-val" id="st-delivered">—</div><div class="sc-sub">Completed deliveries</div></div>
+          <div class="stat-card sc-green"><div class="sc-icon">💰</div><div class="sc-label">Today's Revenue</div><div class="sc-val" id="st-revenue">—</div><div class="sc-sub">Total order value</div></div>
+          <div class="stat-card sc-amber"><div class="sc-icon">🌾</div><div class="sc-label">Farmer Collections</div><div class="sc-val" id="st-farmer">—</div><div class="sc-sub">Pending pickups</div></div>
+          <div class="stat-card sc-blue"><div class="sc-icon">👤</div><div class="sc-label">New Users Today</div><div class="sc-val" id="st-users">—</div><div class="sc-sub">Registered today</div></div>
+        </div>
+
+        <!-- Recent Orders + Recent Farmer Listings side by side -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <div>
+            <div class="sec-hdr"><h3>Recent Orders</h3><button class="btn-sm btn-green" onclick="showView('orders-pending')">View All →</button></div>
+            <div class="table-wrap"><table class="tbl" id="dash-orders-tbl">
+              <thead><tr><th>Order #</th><th>Customer</th><th>Amount</th><th>Status</th></tr></thead>
+              <tbody id="dash-orders-body"><tr><td colspan="4" class="tbl-empty">Loading…</td></tr></tbody>
+            </table></div>
+          </div>
+          <div>
+            <div class="sec-hdr"><h3>Farmer Listings</h3><button class="btn-sm btn-amber" onclick="showView('farmer-pending')">View All →</button></div>
+            <div class="table-wrap"><table class="tbl" id="dash-farmer-tbl">
+              <thead><tr><th>Listing #</th><th>Farmer</th><th>Est. Value</th><th>Status</th></tr></thead>
+              <tbody id="dash-farmer-body"><tr><td colspan="4" class="tbl-empty">Loading…</td></tr></tbody>
+            </table></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ORDERS VIEWS ── -->
+      <div class="view" id="view-orders-pending">
+        <div class="sec-hdr"><h3>⏳ Pending Orders</h3><div class="sec-hdr-actions">
+          <select class="filter-select" onchange="filterOrdersByCity(this.value)" id="city-filter-p">
+            <option value="">All Cities</option>
+            <option>Mundargi</option><option>Gadag</option><option>Ron</option>
+            <option>Shirahatti</option><option>Laxmeshwar</option><option>Nargund</option><option>Hubli</option>
+          </select>
+          <input type="date" class="filter-input" onchange="filterOrdersByDate(this.value,'pending')" title="Filter by date">
+        </div></div>
+        <div class="table-wrap" id="pending-orders-wrap"><div class="loading">Loading…</div></div>
+      </div>
+
+      <div class="view" id="view-orders-active">
+        <div class="sec-hdr"><h3>🚚 Active Orders</h3></div>
+        <div class="table-wrap" id="active-orders-wrap"><div class="loading">Loading…</div></div>
+      </div>
+
+      <div class="view" id="view-orders-completed">
+        <div class="sec-hdr"><h3>✅ Completed Orders</h3><div class="sec-hdr-actions">
+          <input type="date" class="filter-input" onchange="filterOrdersByDate(this.value,'delivered')" title="Filter by date">
+        </div></div>
+        <div class="table-wrap" id="completed-orders-wrap"><div class="loading">Loading…</div></div>
+      </div>
+
+      <div class="view" id="view-orders-all">
+        <div class="sec-hdr"><h3>📋 All Orders</h3><div class="sec-hdr-actions">
+          <select class="filter-select" id="status-filter-all" onchange="loadAllOrders()">
+            <option value="">All Statuses</option>
+            <option value="placed">Placed</option><option value="confirmed">Confirmed</option>
+            <option value="out_for_delivery">Out for Delivery</option>
+            <option value="delivered">Delivered</option><option value="cancelled">Cancelled</option>
+          </select>
+          <select class="filter-select" onchange="filterOrdersByCity(this.value)" id="city-filter-all">
+            <option value="">All Cities</option>
+            <option>Mundargi</option><option>Gadag</option><option>Ron</option>
+            <option>Shirahatti</option><option>Laxmeshwar</option><option>Hubli</option>
+          </select>
+        </div></div>
+        <div class="table-wrap" id="all-orders-wrap"><div class="loading">Loading…</div></div>
+      </div>
+
+      <!-- ── FARMER VIEWS ── -->
+      <div class="view" id="view-farmer-pending">
+        <div class="sec-hdr"><h3>🌾 Pending Farmer Collections</h3><div class="sec-hdr-actions">
+          <select class="filter-select" onchange="loadFarmerListings('pending',this.value)">
+            <option value="">All Districts</option>
+            <option>Gadag</option><option>Dharwad</option><option>Haveri</option><option>Koppal</option>
+          </select>
+        </div></div>
+        <div class="table-wrap" id="farmer-pending-wrap"><div class="loading">Loading…</div></div>
+      </div>
+
+      <div class="view" id="view-farmer-completed">
+        <div class="sec-hdr"><h3>🏭 Collected from Farmers</h3></div>
+        <div class="table-wrap" id="farmer-completed-wrap"><div class="loading">Loading…</div></div>
+      </div>
+
+      <div class="view" id="view-farmer-all">
+        <div class="sec-hdr"><h3>📑 All Farmer Listings</h3><div class="sec-hdr-actions">
+          <select class="filter-select" onchange="loadFarmerListings(this.value)">
+            <option value="">All Statuses</option>
+            <option value="pending">Pending</option><option value="collected">Collected</option><option value="paid">Paid</option>
+          </select>
+        </div></div>
+        <div class="table-wrap" id="farmer-all-wrap"><div class="loading">Loading…</div></div>
+      </div>
+
+      <!-- ── USERS VIEW ── -->
+      <div class="view" id="view-users">
+        <div class="sec-hdr"><h3>👥 Customers</h3><div class="sec-hdr-actions">
+          <input type="text" class="filter-input" placeholder="Search name or mobile…" oninput="loadUsers(this.value)" style="width:220px">
+        </div></div>
+        <div class="table-wrap" id="users-wrap"><div class="loading">Loading…</div></div>
+      </div>
+
+    </div><!-- /content-area -->
+  </div><!-- /main-content -->
+</div><!-- /app -->
+
+<!-- ORDER DETAIL MODAL -->
+<div class="overlay" id="order-modal" onclick="if(event.target.id==='order-modal')closeModal('order-modal')">
+  <div class="modal">
+    <div class="modal-title" id="om-title">Order Details</div>
+    <div id="om-body"><div class="loading">Loading…</div></div>
+  </div>
+</div>
+
+<!-- FARMER DETAIL MODAL -->
+<div class="overlay" id="farmer-modal" onclick="if(event.target.id==='farmer-modal')closeModal('farmer-modal')">
+  <div class="modal">
+    <div class="modal-title" id="fm-title">Farmer Listing Details</div>
+    <div id="fm-body"><div class="loading">Loading…</div></div>
+  </div>
+</div>
+
+<!-- USER HISTORY MODAL -->
+<div class="overlay" id="user-modal" onclick="if(event.target.id==='user-modal')closeModal('user-modal')">
+  <div class="modal">
+    <div class="modal-title" id="um-title">Customer History</div>
+    <div id="um-body"><div class="loading">Loading…</div></div>
+  </div>
+</div>
+
+<div id="toasts" class="toast-wrap"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  VEGZ ADMIN DASHBOARD JS
+// ═══════════════════════════════════════════════
+const API_BASE = (() => {
+  const h = window.location.hostname;
+  if (h === 'admin.vegz.online') return 'https://api.vegz.online';
+  return 'http://localhost:5001';
+})();
+
+let adminToken = localStorage.getItem('vegz_admin_token') || '';
+let adminUser  = JSON.parse(localStorage.getItem('vegz_admin_user') || 'null');
+let currentView = 'dashboard';
+
+// ── API helper ──────────────────────────────────
+async function api(method, path, body = null) {
+  const opts = { method, headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${adminToken}` }};
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(`${API_BASE}/api/v1${path}`, opts);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || `Error ${res.status}`);
+  return data;
+}
+
+// ── Login ───────────────────────────────────────
+async function adminLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+  const err   = document.getElementById('login-err');
+  const btn   = document.getElementById('btn-admin-login');
+  err.textContent = '';
+  if (!email || !pass) { err.textContent = 'Enter email and password.'; return; }
+  btn.disabled = true; btn.innerHTML = '<div class="spin"></div><span>Logging in…</span>';
+  try {
+    const res = await api('POST', '/admin/auth/login', { email, password: pass });
+    adminToken = res.token;
+    adminUser  = res.admin;
+    localStorage.setItem('vegz_admin_token', adminToken);
+    localStorage.setItem('vegz_admin_user', JSON.stringify(adminUser));
+    showApp();
+  } catch (e) {
+    err.textContent = e.message || 'Login failed. Check credentials.';
+    btn.disabled = false; btn.innerHTML = '<span>Login to Dashboard</span><span>→</span>';
+  }
+}
+
+function adminLogout() {
+  if (!confirm('Logout?')) return;
+  localStorage.removeItem('vegz_admin_token');
+  localStorage.removeItem('vegz_admin_user');
+  location.reload();
+}
+
+// ── Show app ────────────────────────────────────
+function showApp() {
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('admin-app').style.display  = 'flex';
+  if (adminUser) {
+    document.getElementById('sb-admin-name').textContent    = adminUser.name;
+    document.getElementById('sb-admin-initial').textContent = adminUser.name[0];
+  }
+  if (window.innerWidth <= 768) document.getElementById('mob-menu-btn').style.display = 'block';
+  loadDashboard();
+  loadNotifications();
+  setInterval(loadNotifications, 30000); // Poll every 30s
+}
+
+// ── View switching ──────────────────────────────
+function showView(v) {
+  currentView = v;
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.getElementById(`view-${v}`)?.classList.add('active');
+
+  const titles = {
+    'dashboard':'Dashboard Overview','orders-pending':'⏳ Pending Orders',
+    'orders-active':'🚚 Active Orders','orders-completed':'✅ Completed Orders',
+    'orders-all':'📋 All Orders','farmer-pending':'🌾 Pending Collections',
+    'farmer-completed':'🏭 Collected','farmer-all':'📑 All Listings','users':'👥 Customers',
+  };
+  document.getElementById('page-title').textContent = titles[v] || v;
+
+  if (v === 'dashboard')          loadDashboard();
+  if (v === 'orders-pending')     loadOrders('placed,confirmed');
+  if (v === 'orders-active')      loadOrders('processing,out_for_delivery');
+  if (v === 'orders-completed')   loadOrders('delivered');
+  if (v === 'orders-all')         loadAllOrders();
+  if (v === 'farmer-pending')     loadFarmerListings('pending');
+  if (v === 'farmer-completed')   loadFarmerListings('collected');
+  if (v === 'farmer-all')         loadFarmerListings();
+  if (v === 'users')              loadUsers();
+
+  document.getElementById('notif-panel').classList.remove('open');
+  document.getElementById('last-refresh').textContent = 'Now: ' + new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+}
+
+function refreshCurrent() { showView(currentView); }
+
+// ── Dashboard ───────────────────────────────────
+async function loadDashboard() {
+  try {
+    const res = await api('GET', '/admin/dashboard');
+    const d = res.data;
+    document.getElementById('st-orders').textContent    = d.todayOrders;
+    document.getElementById('st-pending').textContent   = d.pendingOrders;
+    document.getElementById('st-delivered').textContent = d.deliveredToday;
+    document.getElementById('st-revenue').textContent   = '₹' + (d.todayRevenue||0).toLocaleString('en-IN');
+    document.getElementById('st-farmer').textContent    = d.pendingFarmerCollections;
+    document.getElementById('st-users').textContent     = d.newUsersToday;
+    document.getElementById('nb-pending').textContent   = d.pendingOrders;
+    document.getElementById('nb-farmer').textContent    = d.pendingFarmerCollections;
+
+    // Load recent orders for dashboard
+    const orders = await api('GET', '/admin/orders?limit=6');
+    renderDashOrders(orders.data || []);
+    const farmer = await api('GET', '/admin/farmer/listings?status=pending');
+    renderDashFarmer((farmer.data||[]).slice(0,6));
+  } catch (e) { toast(e.message,'error'); }
+}
+
+function renderDashOrders(orders) {
+  const tb = document.getElementById('dash-orders-body');
+  if (!orders.length) { tb.innerHTML = '<tr><td colspan="4" class="tbl-empty">No orders yet</td></tr>'; return; }
+  tb.innerHTML = orders.map(o => `
+    <tr onclick="openOrderDetail(${o.id})" style="cursor:pointer">
+      <td><strong>${o.order_number}</strong></td>
+      <td>${o.user_name||''}<br><span style="font-size:11px;color:var(--muted)">${o.city||''}</span></td>
+      <td>₹${Number(o.total_amount).toLocaleString('en-IN')}</td>
+      <td><span class="badge b-${o.status}">${fmtStatus(o.status)}</span></td>
+    </tr>`).join('');
+}
+
+function renderDashFarmer(listings) {
+  const tb = document.getElementById('dash-farmer-body');
+  if (!listings.length) { tb.innerHTML = '<tr><td colspan="4" class="tbl-empty">No farmer listings</td></tr>'; return; }
+  tb.innerHTML = listings.map(l => `
+    <tr onclick="openFarmerDetail(${l.id})" style="cursor:pointer">
+      <td><strong>${l.listing_number}</strong></td>
+      <td>${l.farmer_name}<br><span style="font-size:11px;color:var(--muted)">${l.village||''}</span></td>
+      <td>~₹${Number(l.estimated_total).toLocaleString('en-IN')}</td>
+      <td><span class="badge b-${l.status}">${fmtStatus(l.status)}</span></td>
+    </tr>`).join('');
+}
+
+// ── Orders ──────────────────────────────────────
+let _ordersCache = {};
+async function loadOrders(statusFilter, cityFilter='', dateFilter='') {
+  const wrapId = {
+    'placed,confirmed':'pending-orders-wrap',
+    'processing,out_for_delivery':'active-orders-wrap',
+    'delivered':'completed-orders-wrap',
+  }[statusFilter] || 'all-orders-wrap';
+
+  const wrap = document.getElementById(wrapId);
+  wrap.innerHTML = '<div class="loading">Loading orders…</div>';
+  try {
+    const statuses = statusFilter.split(',');
+    const allRows = [];
+    for (const s of statuses) {
+      const res = await api('GET', `/admin/orders?status=${s}${cityFilter?'&city='+cityFilter:''}${dateFilter?'&date='+dateFilter:''}&limit=100`);
+      allRows.push(...(res.data||[]));
+    }
+    allRows.sort((a,b) => new Date(b.created_at)-new Date(a.created_at));
+    wrap.innerHTML = renderOrdersTable(allRows, wrapId);
+  } catch (e) { wrap.innerHTML = `<div class="tbl-empty">Error: ${e.message}</div>`; }
+}
+
+async function loadAllOrders() {
+  const status = document.getElementById('status-filter-all')?.value || '';
+  const city   = document.getElementById('city-filter-all')?.value   || '';
+  const wrap   = document.getElementById('all-orders-wrap');
+  wrap.innerHTML = '<div class="loading">Loading…</div>';
+  try {
+    const res = await api('GET', `/admin/orders?${status?'status='+status:''}&${city?'city='+city:''}&limit=100`);
+    wrap.innerHTML = renderOrdersTable(res.data||[], 'all-orders-wrap');
+  } catch (e) { wrap.innerHTML = `<div class="tbl-empty">${e.message}</div>`; }
+}
+
+function renderOrdersTable(orders, wrapId) {
+  if (!orders.length) return `<table class="tbl"><tbody><tr><td class="tbl-empty">No orders found</td></tr></tbody></table>`;
+  return `<table class="tbl">
+    <thead><tr><th>Order #</th><th>Customer</th><th>City</th><th>Amount</th><th>Payment</th><th>Time</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>${orders.map(o=>`
+      <tr>
+        <td style="cursor:pointer;color:var(--g);font-weight:700" onclick="openOrderDetail(${o.id})">${o.order_number}</td>
+        <td>${o.user_name||'—'}<br><span style="font-size:11px;color:var(--muted)">${o.user_mobile||''}</span></td>
+        <td>${o.city||'—'}</td>
+        <td style="font-weight:700">₹${Number(o.total_amount).toLocaleString('en-IN')}</td>
+        <td><span style="font-size:11px;font-weight:600;color:${o.payment_status==='paid'?'var(--g)':'var(--a)'}">${(o.payment_method||'').toUpperCase()}<br>${o.payment_status}</span></td>
+        <td style="font-size:12px;color:var(--muted)">${fmtTime(o.created_at)}</td>
+        <td><span class="badge b-${o.status}">${fmtStatus(o.status)}</span></td>
+        <td>
+          <select onchange="updateOrderStatus(${o.id},this.value,this)" class="status-select" style="width:140px">
+            <option value="">Change status…</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="processing">Processing</option>
+            <option value="out_for_delivery">Out for Delivery</option>
+            <option value="delivered">Delivered ✓</option>
+            <option value="cancelled">Cancel</option>
+          </select>
+        </td>
+      </tr>`).join('')}</tbody></table>`;
+}
+
+async function updateOrderStatus(orderId, status, selectEl) {
+  if (!status) return;
+  if (!confirm(`Update order to "${fmtStatus(status)}"?`)) { selectEl.value=''; return; }
+  try {
+    await api('PATCH', `/admin/orders/${orderId}/status`, { status });
+    toast(`Order updated to ${fmtStatus(status)}`, 'success');
+    selectEl.closest('tr').querySelector('.badge').textContent = fmtStatus(status);
+    selectEl.closest('tr').querySelector('.badge').className = `badge b-${status}`;
+    selectEl.value = '';
+  } catch (e) { toast(e.message,'error'); selectEl.value=''; }
+}
+
+async function openOrderDetail(id) {
+  document.getElementById('order-modal').classList.add('open');
+  document.getElementById('om-body').innerHTML = '<div class="loading">Loading…</div>';
+  try {
+    const res = await api('GET', `/admin/orders/${id}`);
+    const o = res.data;
+    document.getElementById('om-title').textContent = `Order ${o.order_number}`;
+    document.getElementById('om-body').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px">CUSTOMER</div>
+          <div class="detail-row"><span class="dr-label">Name</span><span class="dr-val">${o.user_name||'—'}</span></div>
+          <div class="detail-row"><span class="dr-label">Mobile</span><span class="dr-val">${o.user_mobile||'—'}</span></div>
+          <div class="detail-row"><span class="dr-label">Address</span><span class="dr-val">${o.address_line1||''}, ${o.city||''}</span></div>
+          <div class="detail-row"><span class="dr-label">Contact</span><span class="dr-val">${o.contact_phone||'—'}</span></div>
+          <div class="detail-row"><span class="dr-label">Delivery time</span><span class="dr-val">${o.delivery_time||'—'}</span></div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px">ORDER</div>
+          <div class="detail-row"><span class="dr-label">Status</span><span class="dr-val"><span class="badge b-${o.status}">${fmtStatus(o.status)}</span></span></div>
+          <div class="detail-row"><span class="dr-label">Payment</span><span class="dr-val">${(o.payment_method||'').toUpperCase()} · ${o.payment_status}</span></div>
+          <div class="detail-row"><span class="dr-label">Total</span><span class="dr-val" style="font-size:18px;font-weight:800;color:var(--g)">₹${Number(o.total_amount).toLocaleString('en-IN')}</span></div>
+          <div class="detail-row"><span class="dr-label">Placed</span><span class="dr-val">${fmtTime(o.created_at)}</span></div>
+        </div>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px">ITEMS</div>
+      <div class="table-wrap" style="margin-bottom:20px"><table class="tbl">
+        <thead><tr><th>Item</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead>
+        <tbody>${(o.items||[]).map(i=>`<tr><td>${i.product_name}</td><td>${i.quantity_label}</td><td>₹${Number(i.unit_price).toLocaleString('en-IN')}</td><td>₹${Number(i.total_price).toLocaleString('en-IN')}</td></tr>`).join('')}</tbody>
+      </table></div>
+      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px">UPDATE STATUS</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${['confirmed','processing','out_for_delivery','delivered','cancelled'].map(s=>
+          `<button class="btn-sm ${s==='cancelled'?'btn-red':s==='delivered'?'btn-green':'btn-blue'}" onclick="updateOrderStatus(${id},'${s}',{value:'',closest:()=>({querySelector:()=>null})});closeModal('order-modal')">${fmtStatus(s)}</button>`
+        ).join('')}
+      </div>`;
+  } catch (e) { document.getElementById('om-body').innerHTML = `<div class="tbl-empty">Error: ${e.message}</div>`; }
+}
+
+// ── Farmer listings ─────────────────────────────
+async function loadFarmerListings(status='', district='') {
+  const wrapId = { 'pending':'farmer-pending-wrap','collected':'farmer-completed-wrap',''  :'farmer-all-wrap' }[status] || 'farmer-all-wrap';
+  const wrap = document.getElementById(wrapId);
+  wrap.innerHTML = '<div class="loading">Loading…</div>';
+  try {
+    const res = await api('GET', `/admin/farmer/listings?${status?'status='+status:''}&${district?'district='+district:''}`);
+    const listings = res.data||[];
+    if (!listings.length) { wrap.innerHTML = '<div class="tbl-empty">No listings found</div>'; return; }
+    wrap.innerHTML = `<table class="tbl">
+      <thead><tr><th>Listing #</th><th>Farmer</th><th>Village/District</th><th>Items</th><th>Est. Value</th><th>Actual</th><th>Pickup Time</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>${listings.map(l=>`
+        <tr>
+          <td style="cursor:pointer;color:var(--g);font-weight:700" onclick="openFarmerDetail(${l.id})">${l.listing_number}</td>
+          <td>${l.farmer_name}<br><span style="font-size:11px;color:var(--muted)">${l.farmer_mobile||''}</span></td>
+          <td>${l.village||'—'}<br><span style="font-size:11px;color:var(--muted)">${l.district||''}</span></td>
+          <td style="text-align:center">${l.item_count||'—'}</td>
+          <td>~₹${Number(l.estimated_total).toLocaleString('en-IN')}</td>
+          <td>${l.actual_total?'₹'+Number(l.actual_total).toLocaleString('en-IN'):'—'}</td>
+          <td style="font-size:12px;color:var(--muted)">${l.pickup_time||'—'}</td>
+          <td><span class="badge b-${l.status}">${fmtStatus(l.status)}</span></td>
+          <td style="display:flex;gap:4px;flex-wrap:wrap">
+            <button class="btn-sm btn-blue" onclick="openFarmerDetail(${l.id})">Details</button>
+            ${l.status==='pending'?`<button class="btn-sm btn-amber" onclick="updateFarmerStatus(${l.id},'agent_assigned')">Assign Agent</button>`:''}
+            ${l.status==='agent_assigned'||l.status==='in_transit'?`<button class="btn-sm btn-green" onclick="markCollected(${l.id})">Mark Collected</button>`:''}
+            ${l.status==='collected'?`<button class="btn-sm btn-green" onclick="markFarmerPaid(${l.id})">Mark Paid</button>`:''}
+          </td>
+        </tr>`).join('')}
+      </tbody></table>`;
+  } catch (e) { wrap.innerHTML = `<div class="tbl-empty">Error: ${e.message}</div>`; }
+}
+
+async function updateFarmerStatus(id, status) {
+  try {
+    await api('PATCH', `/admin/farmer/listings/${id}`, { status });
+    toast('Status updated','success');
+    refreshCurrent();
+  } catch (e) { toast(e.message,'error'); }
+}
+
+async function markCollected(id) {
+  const actual = prompt('Enter ACTUAL quantity collected (kg total all items combined, or press OK to just mark collected):');
+  await api('PATCH', `/admin/farmer/listings/${id}`, { status:'collected', actualTotal: actual ? parseFloat(actual) : null });
+  toast('Marked as collected!','success');
+  refreshCurrent();
+}
+
+async function markFarmerPaid(id) {
+  const ref = prompt('Enter UPI transaction reference number (UTR):');
+  if (!ref) return;
+  const amt = prompt('Enter actual amount paid (₹):');
+  await api('POST', `/admin/farmer/listings/${id}/pay`, { paymentRef: ref, paidAmount: parseFloat(amt||0) });
+  toast('Payment marked!','success');
+  refreshCurrent();
+}
+
+async function openFarmerDetail(id) {
+  document.getElementById('farmer-modal').classList.add('open');
+  document.getElementById('fm-body').innerHTML = '<div class="loading">Loading…</div>';
+  try {
+    // Fetch from farmer listings — need to build a GET /admin/farmer/listings/:id
+    const res = await api('GET', `/admin/farmer/listings?status=`);
+    const listing = (res.data||[]).find(l=>l.id===id);
+    if (!listing) throw new Error('Not found');
+    document.getElementById('fm-title').textContent = `${listing.listing_number}`;
+    document.getElementById('fm-body').innerHTML = `
+      <div class="detail-row"><span class="dr-label">Farmer</span><span class="dr-val">${listing.farmer_name}</span></div>
+      <div class="detail-row"><span class="dr-label">Mobile</span><span class="dr-val">${listing.farmer_mobile||'—'}</span></div>
+      <div class="detail-row"><span class="dr-label">Village</span><span class="dr-val">${listing.village}, ${listing.taluk||''}, ${listing.district}</span></div>
+      <div class="detail-row"><span class="dr-label">Landmark</span><span class="dr-val">${listing.landmark||'—'}</span></div>
+      <div class="detail-row"><span class="dr-label">Pickup Time</span><span class="dr-val">${listing.pickup_time||'—'}</span></div>
+      <div class="detail-row"><span class="dr-label">Est. Total</span><span class="dr-val" style="color:var(--g);font-weight:800">~₹${Number(listing.estimated_total).toLocaleString('en-IN')}</span></div>
+      <div class="detail-row"><span class="dr-label">Actual Total</span><span class="dr-val">${listing.actual_total?'₹'+Number(listing.actual_total).toLocaleString('en-IN'):'Not yet collected'}</span></div>
+      <div class="detail-row"><span class="dr-label">Payment Status</span><span class="dr-val">${listing.payment_status||'pending'}</span></div>
+      <div class="detail-row"><span class="dr-label">Status</span><span class="dr-val"><span class="badge b-${listing.status}">${fmtStatus(listing.status)}</span></span></div>
+      ${listing.location_lat?`<div class="detail-row"><span class="dr-label">GPS</span><span class="dr-val"><a href="https://www.openstreetmap.org/?mlat=${listing.location_lat}&mlon=${listing.location_lng}" target="_blank" style="color:var(--b)">View on Map 📍</a></span></div>`:''}
+      <div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap">
+        ${listing.status==='pending'?`<button class="btn-sm btn-amber" onclick="updateFarmerStatus(${id},'agent_assigned');closeModal('farmer-modal')">Assign Agent</button>`:''}
+        ${listing.status==='collected'?`<button class="btn-sm btn-green" onclick="markFarmerPaid(${id});closeModal('farmer-modal')">Mark Paid</button>`:''}
+        <a href="tel:${listing.farmer_mobile}" class="btn-sm btn-blue">📞 Call Farmer</a>
+      </div>`;
+  } catch (e) { document.getElementById('fm-body').innerHTML = `<div class="tbl-empty">${e.message}</div>`; }
+}
+
+// ── Users ───────────────────────────────────────
+async function loadUsers(search='') {
+  const wrap = document.getElementById('users-wrap');
+  wrap.innerHTML = '<div class="loading">Loading…</div>';
+  try {
+    const res = await api('GET', `/admin/users?search=${encodeURIComponent(search)}`);
+    const users = res.data||[];
+    if (!users.length) { wrap.innerHTML = '<div class="tbl-empty">No customers found</div>'; return; }
+    wrap.innerHTML = `<table class="tbl">
+      <thead><tr><th>Name / Mobile</th><th>Business</th><th>Total Orders</th><th>Total Spent</th><th>Last Order</th><th>Action</th></tr></thead>
+      <tbody>${users.map(u=>`
+        <tr>
+          <td style="cursor:pointer;color:var(--g);font-weight:700" onclick="openUserHistory(${u.id})">${u.name||'—'}<br><span style="font-size:11px;color:var(--muted)">${u.mobile}</span></td>
+          <td>${u.business_name||'—'}<br><span style="font-size:11px;color:var(--muted)">${u.business_type||''}</span></td>
+          <td style="text-align:center;font-weight:700">${u.total_orders||0}</td>
+          <td style="font-weight:700;color:var(--g)">₹${Number(u.total_spent||0).toLocaleString('en-IN')}</td>
+          <td style="font-size:12px;color:var(--muted)">${u.last_order_at?fmtTime(u.last_order_at):'No orders'}</td>
+          <td><button class="btn-sm btn-blue" onclick="openUserHistory(${u.id})">Order History</button></td>
+        </tr>`).join('')}
+      </tbody></table>`;
+  } catch (e) { wrap.innerHTML = `<div class="tbl-empty">${e.message}</div>`; }
+}
+
+async function openUserHistory(userId) {
+  document.getElementById('user-modal').classList.add('open');
+  document.getElementById('um-body').innerHTML = '<div class="loading">Loading…</div>';
+  try {
+    const res = await api('GET', `/admin/users/${userId}/orders`);
+    const { user, orders } = res.data;
+    document.getElementById('um-title').textContent = `${user.name||user.mobile} — Order History`;
+    document.getElementById('um-body').innerHTML = `
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;font-size:13px">
+        <div><strong>${user.name||'—'}</strong></div>
+        <div style="color:var(--muted)">${user.mobile}</div>
+        <div style="color:var(--muted)">${user.business_name||''} ${user.business_type?'('+user.business_type+')':''}</div>
+      </div>
+      <div class="table-wrap"><table class="tbl">
+        <thead><tr><th>Order #</th><th>Date</th><th>City</th><th>Amount</th><th>Status</th></tr></thead>
+        <tbody>${orders.map(o=>`
+          <tr onclick="openOrderDetail(${o.id})" style="cursor:pointer">
+            <td style="color:var(--g);font-weight:700">${o.order_number}</td>
+            <td style="font-size:12px;color:var(--muted)">${fmtTime(o.created_at)}</td>
+            <td>${o.city||'—'}</td>
+            <td>₹${Number(o.total_amount).toLocaleString('en-IN')}</td>
+            <td><span class="badge b-${o.status}">${fmtStatus(o.status)}</span></td>
+          </tr>`).join('')}
+        </tbody></table></div>`;
+  } catch (e) { document.getElementById('um-body').innerHTML = `<div class="tbl-empty">${e.message}</div>`; }
+}
+
+// ── Notifications ───────────────────────────────
+async function loadNotifications() {
+  try {
+    const res = await api('GET', '/admin/notifications');
+    const notifs = res.data||[];
+    if (notifs.length) {
+      document.getElementById('notif-dot').style.display = 'block';
+      document.getElementById('notif-list').innerHTML = notifs.map(n=>`
+        <div class="notif-item">
+          <div class="ni-title">${n.title}</div>
+          <div class="ni-body">${n.body}</div>
+          <div class="ni-time">${fmtTime(n.created_at)}</div>
+        </div>`).join('');
+    }
+  } catch {}
+}
+
+function toggleNotif() {
+  document.getElementById('notif-panel').classList.toggle('open');
+  document.getElementById('notif-dot').style.display = 'none';
+}
+
+// ── Filters ─────────────────────────────────────
+function filterOrdersByCity(city) {
+  const s = currentView==='orders-pending' ? 'placed,confirmed' : currentView==='orders-active' ? 'processing,out_for_delivery' : 'delivered';
+  loadOrders(s, city);
+}
+function filterOrdersByDate(date, status) { loadOrders(status, '', date); }
+
+// ── Global search ────────────────────────────────
+let _searchTimer;
+function globalSearch(q) {
+  clearTimeout(_searchTimer);
+  if (!q) return;
+  _searchTimer = setTimeout(() => { showView('users'); loadUsers(q); }, 400);
+}
+
+// ── Modal ────────────────────────────────────────
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ── Helpers ──────────────────────────────────────
+function fmtStatus(s) {
+  const m = { placed:'Placed',confirmed:'Confirmed',processing:'Processing',out_for_delivery:'Out for Delivery',delivered:'Delivered',cancelled:'Cancelled',pending:'Pending',agent_assigned:'Agent Assigned',in_transit:'In Transit',collected:'Collected',paid:'Paid' };
+  return m[s] || s;
+}
+
+function fmtTime(ts) {
+  if (!ts) return '—';
+  const d = new Date(ts);
+  const today = new Date();
+  const diff = today - d;
+  if (diff < 60000) return 'Just now';
+  if (diff < 3600000) return `${Math.floor(diff/60000)}m ago`;
+  if (d.toDateString()===today.toDateString()) return d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+}
+
+function toast(msg,type='info'){
+  let w=document.getElementById('toasts');
+  if(!w){w=document.createElement('div');w.id='toasts';w.className='toast-wrap';document.body.appendChild(w);}
+  const t=document.createElement('div');t.className=`toast ${type}`;t.textContent=msg;w.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(8px)';t.style.transition='.3s';setTimeout(()=>t.remove(),300)},3500);
+}
+
+// ── Init ─────────────────────────────────────────
+if (adminToken) { showApp(); }
+else document.getElementById('login-page').style.display = 'flex';
+document.addEventListener('keydown', e => {
+  if (e.key==='Escape') document.querySelectorAll('.overlay.open').forEach(m=>m.classList.remove('open'));
+});
+if (window.innerWidth<=768) document.getElementById('mob-menu-btn').style.display='block';
+</script>
+</body>
+</html>

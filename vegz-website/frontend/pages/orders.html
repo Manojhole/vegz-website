@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Orders — Vegz</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../css/main.css">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="shop-body">
+<header class="header"><div class="header-inner">
+  <a href="shop.html" class="logo"><span class="logo-mark">🌿</span><span class="logo-text">VEGZ</span></a>
+  <div style="margin-left:auto;display:flex;gap:12px;align-items:center">
+    <a href="shop.html" style="font-size:14px;color:var(--ink3);font-weight:600">← Back to Shop</a>
+    <button onclick="logout()" class="btn-secondary" style="font-size:13px;padding:6px 14px">Logout</button>
+  </div>
+</div></header>
+
+<div class="orders-wrap">
+  <h2 style="font-family:var(--display);font-size:32px;font-weight:800;color:var(--ink);margin-bottom:24px">My Orders</h2>
+  <div id="orders-list"><p style="color:var(--g5)">Loading…</p></div>
+</div>
+
+<div id="toasts" class="toast-wrap"></div>
+<script src="../js/config.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script>
+lucide.createIcons();
+if (!requireAuth()) {}
+
+const STATUS = {
+  placed:           { label:'Order Placed',      cls:'s-placed' },
+  confirmed:        { label:'Confirmed',          cls:'s-confirmed' },
+  processing:       { label:'Processing',         cls:'s-confirmed' },
+  out_for_delivery: { label:'Out for Delivery',   cls:'s-confirmed' },
+  delivered:        { label:'Delivered ✓',        cls:'s-delivered' },
+  cancelled:        { label:'Cancelled',          cls:'s-cancelled' },
+};
+
+async function load() {
+  const list = document.getElementById('orders-list');
+  try {
+    const res = await API.getOrders();
+    const orders = res.data || [];
+    if (!orders.length) {
+      list.innerHTML = `
+        <div style="text-align:center;padding:60px;color:var(--g4)">
+          <div style="font-size:56px;margin-bottom:16px">📋</div>
+          <p style="font-size:18px;font-weight:700;color:var(--ink3);margin-bottom:8px">No orders yet</p>
+          <p>Your order history will appear here</p>
+          <a href="shop.html" class="btn-primary" style="display:inline-flex;margin-top:20px;padding:12px 24px;font-size:14px">Start Shopping</a>
+        </div>`;
+      return;
+    }
+    list.innerHTML = orders.map(o => {
+      const cfg  = STATUS[o.status] || STATUS.placed;
+      const date = new Date(o.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+      return `
+        <div class="ord-card">
+          <div class="ord-top">
+            <div>
+              <div class="ord-num">${o.order_number}</div>
+              <div class="ord-date">${date}</div>
+            </div>
+            <span class="sbadge ${cfg.cls}">${cfg.label}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+            <div>
+              <div style="font-size:13px;color:var(--g5)">📍 ${o.address_line1||''}, ${o.city||''}</div>
+              <div style="font-size:12px;color:var(--g4);margin-top:4px;text-transform:uppercase;letter-spacing:.5px">${o.payment_method} · ${o.payment_status}</div>
+            </div>
+            <div style="font-family:var(--display);font-size:22px;font-weight:800;color:var(--g700)">₹${Number(o.total_amount).toLocaleString('en-IN')}</div>
+          </div>
+        </div>`;
+    }).join('');
+  } catch (e) {
+    list.innerHTML = `<p style="color:var(--r600)">⚠️ ${e.message}</p>`;
+  }
+}
+load();
+</script>
+</body>
+</html>

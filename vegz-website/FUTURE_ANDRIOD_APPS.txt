@@ -1,0 +1,154 @@
+# VEGZ — Future Android Application Plan
+# Saved: April 2026
+# Status: NOT started — future roadmap only
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  OVERVIEW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Four planned Android applications:
+
+1. vegz           — Customer app (order vegetables)
+2. vegz-farmers   — Farmer app (sell listing, track payment)
+3. vegz-agent     — Agent app (delivery + pickup jobs)
+[4. vegz-admin    — Admin mobile (optional, web works fine)]
+
+Priority order: agent → farmers → customers
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  WHY REACT NATIVE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+- Same JavaScript as our web frontend
+- Same backend API — zero backend changes needed
+- One codebase runs on Android + iOS
+- Firebase FCM native push notifications (better than web)
+- Expo makes publishing to Play Store easy (no Mac needed for Android)
+- React Native Maps (Google Maps in app, not browser)
+- Offline capability with AsyncStorage
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  APP 1: vegz-agent (Highest Priority)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Why first: Agent needs real-time GPS, background location,
+           push notifications for new jobs — native is much
+           better than web for these features.
+
+Key features:
+  ✅ Background GPS tracking (every 30 seconds even when app closed)
+  ✅ Push notification for new job assignment
+  ✅ Google Maps turn-by-turn navigation (in-app, not browser)
+  ✅ Camera — take photo as proof of delivery
+  ✅ One-tap confirm delivery
+  ✅ Offline job list (works without internet briefly)
+  ✅ Earnings history
+
+Tech:
+  React Native Maps → Google Maps
+  expo-location → Background GPS
+  expo-camera → Proof of delivery photos
+  expo-notifications → Push notifications
+  AsyncStorage → Offline job cache
+
+API endpoints (same as web — no changes):
+  POST /api/v1/agent/auth/login
+  GET  /api/v1/agent/assignments
+  PATCH /api/v1/agent/assignments/:id/status
+  POST /api/v1/agent/location   ← sends GPS every 30s
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  APP 2: vegz-farmers
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Why second: Farmers use basic Android phones. Web works
+            but native feels more familiar for them.
+
+Key features:
+  ✅ UI fully in Kannada (language setting)
+  ✅ List vegetables to sell (same flow as web)
+  ✅ Track collection status with timeline
+  ✅ View payment history
+  ✅ Price updates — what Vegz is paying today per kg
+  ✅ Push notification when agent is coming
+  ✅ Push notification when payment is sent
+  ✅ Works on basic 4G Android (minimal data usage)
+
+Kannada support:
+  All text in Kannada
+  English option available
+  Prices in Indian format (₹ with lakh/crore)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  APP 3: vegz (Customer App)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Why third: Web works perfectly on mobile. Native adds:
+           push notifications for order status, and
+           slightly faster ordering experience.
+
+Key features:
+  ✅ All web features in native
+  ✅ Push notification for order status changes
+  ✅ Live order tracking on map (agent location)
+  ✅ Saved addresses (biometric autofill)
+  ✅ WhatsApp-style chat for order support
+  ✅ Quick reorder (order same as last time)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  RECOMMENDED TECH STACK
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Framework:    React Native 0.73+ with Expo SDK 50+
+Navigation:   React Navigation 6
+State:        Zustand (simple, small)
+API calls:    Axios (same as web)
+Auth:         AsyncStorage for JWT token
+Maps:         react-native-maps (Google Maps)
+Location:     expo-location (background mode)
+Camera:       expo-camera
+Push Notif:   expo-notifications + Firebase FCM
+UI Kit:       React Native Paper or custom (match vegz brand)
+Build:        EAS Build (Expo) — builds APK without Mac
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PLAY STORE REQUIREMENTS (when ready)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Google Play Console: $25 one-time fee
+Need: Privacy Policy URL (already have it at vegz.online/pages/privacy.html)
+Need: App screenshots, icon (512×512), feature graphic
+Review time: 3-7 days for first submission
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  BACKEND CHANGES NEEDED FOR NATIVE APPS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Almost none! The REST API already works for mobile.
+
+Small additions needed:
+  - Device type in push_tokens (android | ios | web)
+  - File upload endpoint for delivery photos (multipart/form-data)
+  - Agent live location endpoint (already exists)
+  - Possibly: WebSocket for real-time order tracking map
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  TIMELINE ESTIMATE (when ready to start)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  vegz-agent:   4-6 weeks (1 developer)
+  vegz-farmers: 4-6 weeks (1 developer)
+  vegz:         6-8 weeks (1 developer)
+
+  All three by one developer: ~4 months
+  With two developers: ~2 months
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+NOTE: Do not start app development until:
+  ✅ Web platform is stable (≥3 months live)
+  ✅ At least 20+ daily orders
+  ✅ At least 3+ active agents
+  ✅ Razorpay KYC complete
+  ✅ MSG91 DLT approved
+  ✅ Firebase FCM working on web

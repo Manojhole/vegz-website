@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Vegz — Complete Implementation Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--g:#16a34a;--b:#2563eb;--a:#d97706;--r:#dc2626;--ink:#0f172a;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--white:#fff;--serif:'Instrument Serif',serif;--sans:'Plus Jakarta Sans',sans-serif;--mono:'Fira Code',monospace}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.75;-webkit-font-smoothing:antialiased}
+.hero{background:var(--ink);padding:48px 40px;text-align:center}
+.hero h1{font-family:var(--serif);font-size:clamp(32px,5vw,56px);color:#fff;margin-bottom:8px}
+.hero p{color:rgba(255,255,255,.5);font-size:16px;max-width:600px;margin:0 auto}
+.container{max-width:920px;margin:0 auto;padding:0 24px}
+.toc{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:28px;margin:32px 0}
+.toc h3{font-family:var(--serif);font-size:20px;color:var(--ink);margin-bottom:16px}
+.toc ol{padding-left:20px}
+.toc li{margin:6px 0}
+.toc a{color:var(--b);font-size:14px;font-weight:500}
+.toc a:hover{color:var(--ink)}
+.section{margin:40px 0}
+.section-num{font-size:12px;font-weight:700;color:var(--g);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px}
+.section h2{font-family:var(--serif);font-size:clamp(24px,3vw,36px);color:var(--ink);margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--border)}
+.card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:24px;margin:20px 0}
+.card h3{font-family:var(--serif);font-size:20px;color:var(--ink);margin-bottom:12px}
+.card p{font-size:15px;color:var(--muted);margin-bottom:10px;line-height:1.7}
+.card ul,.card ol{padding-left:20px;margin-bottom:10px}
+.card li{font-size:14px;color:var(--muted);margin:6px 0;line-height:1.65}
+.card li strong{color:var(--ink)}
+pre{background:#0f172a;color:#e2e8f0;padding:20px 24px;border-radius:12px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.7;margin:14px 0}
+code{font-family:var(--mono);font-size:12px;background:#f1f5f9;color:var(--b);padding:2px 7px;border-radius:4px}
+.step{display:flex;gap:16px;margin:16px 0;padding:16px;background:var(--bg);border-radius:12px;border-left:3px solid var(--g)}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--g);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;margin-top:2px}
+.step-body h4{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.step-body p{font-size:13px;color:var(--muted);margin:0}
+.warn{background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:14px 18px;margin:14px 0;font-size:14px;color:#92400e}
+.info{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px 18px;margin:14px 0;font-size:14px;color:#1e40af}
+.success{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px 18px;margin:14px 0;font-size:14px;color:#15803d}
+.arch{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:16px 0;padding:20px;background:#0f172a;border-radius:12px;color:#e2e8f0;font-family:var(--mono);font-size:13px}
+.arch-box{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:10px 16px;text-align:center}
+.arch-arr{color:rgba(255,255,255,.4);font-size:20px}
+.table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px}
+.table th{background:#f8fafc;padding:10px 14px;text-align:left;font-weight:700;font-size:11px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border)}
+.table td{padding:10px 14px;border-bottom:1px solid #f1f5f9}
+.badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700}
+.b-free{background:#dcfce7;color:#15803d}
+.b-paid{background:#fee2e2;color:#dc2626}
+.b-cheap{background:#fef3c7;color:#92400e}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>🌿 Vegz — Complete Implementation Guide</h1>
+  <p>Push Notifications · Razorpay UPI · Farmer Payments · Admin Dashboard · EC2 Multi-Domain · Admin Credentials</p>
+</div>
+
+<div class="container">
+<div class="toc">
+  <h3>📋 Table of Contents</h3>
+  <ol>
+    <li><a href="#fix1">Fix Farmer Submit "Not Found" Error</a></li>
+    <li><a href="#push">Push Notifications — FREE with Firebase FCM</a></li>
+    <li><a href="#razorpay">Razorpay UPI Integration (Customers pay you)</a></li>
+    <li><a href="#farmer-payment">Pay Farmers via UPI (Vegz pays farmers)</a></li>
+    <li><a href="#admin">Admin Dashboard — How to use + create credentials</a></li>
+    <li><a href="#ec2">AWS EC2 Multi-Domain Setup (4 domains)</a></li>
+    <li><a href="#db-sql">Run new database tables</a></li>
+    <li><a href="#errors">Common errors and how to fix</a></li>
+  </ol>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="fix1">
+  <div class="section-num">Section 01</div>
+  <h2>Fix Farmer Submit "Not Found"</h2>
+
+  <div class="card">
+    <h3>Root Cause</h3>
+    <p>The <code>POST /api/v1/farmer/listings</code> route did not exist in the backend. The 404 "Not Found" error was correct — the endpoint was never created.</p>
+    <h3>Files to add (in the zip)</h3>
+    <ul>
+      <li><strong>backend/src/routes/farmer.routes.js</strong> — new farmer API</li>
+      <li><strong>backend/src/routes/admin.routes.js</strong> — new admin API</li>
+      <li><strong>database/003_farmer_admin_tables.sql</strong> — new tables</li>
+      <li><strong>frontend/pages/admin.html</strong> — admin dashboard</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Step-by-step fix</h3>
+    <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Run new SQL on Server 2 (MySQL)</h4><p>SSH to Server 2 and run:</p></div></div>
+    <pre>mysql -u vegz_user -p vegz_db &lt; database/003_farmer_admin_tables.sql</pre>
+
+    <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Upload new backend files to Server 1</h4></div></div>
+    <pre>scp -i key.pem backend/src/routes/farmer.routes.js ubuntu@SERVER1_IP:/var/www/vegz/backend/src/routes/
+scp -i key.pem backend/src/routes/admin.routes.js ubuntu@SERVER1_IP:/var/www/vegz/backend/src/routes/
+scp -i key.pem backend/src/server.js ubuntu@SERVER1_IP:/var/www/vegz/backend/src/</pre>
+
+    <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Restart backend</h4></div></div>
+    <pre>pm2 restart vegz-api && pm2 logs vegz-api --lines 20</pre>
+
+    <div class="step"><div class="step-num">4</div><div class="step-body"><h4>Test the endpoint</h4></div></div>
+    <pre>curl https://api.vegz.online/api/v1/farmer/listings
+# Should return: {"success":false,"message":"Admin not authenticated"}
+# (This confirms the route EXISTS — auth error is expected without token)</pre>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="push">
+  <div class="section-num">Section 02</div>
+  <h2>Push Notifications — FREE with Firebase FCM</h2>
+
+  <div class="success">✅ Firebase Cloud Messaging (FCM) is completely FREE for unlimited notifications. No credit card. No cost ever.</div>
+
+  <div class="card">
+    <h3>What you get</h3>
+    <ul>
+      <li>Customer gets push notification when order status changes (confirmed, out for delivery, delivered)</li>
+      <li>Farmer gets notification when agent is assigned or payment is sent</li>
+      <li>Admin gets notification when new order is placed or farmer submits listing</li>
+      <li>Works on Chrome, Firefox, Android (web push) and native Android app (if you build it later)</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Step 1 — Create Firebase Project (5 minutes)</h3>
+    <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Go to console.firebase.google.com</h4><p>Sign in with your Google account → Click "Add project" → Name: "vegz-notifications" → Skip Analytics → Create</p></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Get your config keys</h4><p>Project Settings → General → scroll down → "Add app" → Web (HTML icon) → Register app → Copy the firebaseConfig object</p></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Get Server Key for backend</h4><p>Project Settings → Cloud Messaging tab → "Server key" → Copy it</p></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-body"><h4>Add to .env on Server 1</h4></div></div>
+    <pre>FCM_SERVER_KEY=AAAAxxxxxx:APA91bxxxxxxxx...
+FCM_SENDER_ID=123456789012</pre>
+  </div>
+
+  <div class="card">
+    <h3>Step 2 — Add to Frontend</h3>
+    <p>Create <code>frontend/js/push.js</code>:</p>
+    <pre>// VEGZ Push Notifications via Firebase FCM
+const firebaseConfig = {
+  apiKey: "AIzaSy...",           // from Firebase console
+  authDomain: "vegz.firebaseapp.com",
+  projectId: "vegz-notifications",
+  messagingSenderId: "123456789012",
+  appId: "1:123456789012:web:abcdef"
+};
+
+// Initialize Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging.js";
+
+const app       = initializeApp(firebaseConfig);
+const messaging = getMessaging(app);
+
+// Ask user for notification permission
+async function requestPushPermission() {
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') return;
+
+    const token = await getToken(messaging, {
+      vapidKey: 'YOUR_VAPID_KEY' // from Firebase Console → Cloud Messaging → Web config
+    });
+
+    // Save token to backend
+    await fetch(`${window.VEGZ_CONFIG.API_BASE}/api/v1/users/push-token`, {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+localStorage.getItem('vegz_token') },
+      body: JSON.stringify({ token, platform: 'web' })
+    });
+
+    console.log('Push notifications enabled!');
+  } catch (err) {
+    console.log('Push permission denied or error:', err);
+  }
+}
+
+// Handle foreground notifications
+onMessage(messaging, (payload) => {
+  const { title, body } = payload.notification;
+  // Show as in-app toast
+  showToast(`${title}: ${body}`, 'info');
+  // Also show browser notification
+  new Notification(title, { body, icon: '/icon.png' });
+});
+
+// Call this after login
+export { requestPushPermission };</pre>
+
+    <p>Create <code>frontend/firebase-messaging-sw.js</code> (Service Worker — must be at root level):</p>
+    <pre>importScripts('https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging-compat.js');
+
+firebase.initializeApp({
+  apiKey: "AIzaSy...",
+  authDomain: "vegz.firebaseapp.com",
+  projectId: "vegz-notifications",
+  messagingSenderId: "123456789012",
+  appId: "1:123456789012:web:abcdef"
+});
+
+const messaging = firebase.messaging();
+
+messaging.onBackgroundMessage((payload) => {
+  const { title, body } = payload.notification;
+  self.registration.showNotification(title, {
+    body,
+    icon: '/icon-192.png',
+    badge: '/icon-72.png',
+    data: payload.data
+  });
+});</pre>
+  </div>
+
+  <div class="card">
+    <h3>Step 3 — Send Notifications from Backend</h3>
+    <p>In your order controller, after status update, add:</p>
+    <pre>// backend/src/services/notification.service.js
+const axios = require('axios');
+
+async function sendPushToUser(userId, title, body, data = {}) {
+  const { pool } = require('../config/database');
+  const [tokens] = await pool.execute(
+    'SELECT token FROM push_tokens WHERE user_id=? AND platform IN ("web","android")', [userId]
+  );
+  if (!tokens.length) return;
+
+  for (const { token } of tokens) {
+    await axios.post('https://fcm.googleapis.com/fcm/send', {
+      to: token,
+      notification: { title, body },
+      data,
+    }, {
+      headers: {
+        'Authorization': `key=${process.env.FCM_SERVER_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    }).catch(err => console.log('FCM error:', err.message));
+  }
+}
+
+module.exports = { sendPushToUser };</pre>
+
+    <p>Usage in order controller after status update:</p>
+    <pre>const { sendPushToUser } = require('../services/notification.service');
+
+// After order delivered:
+await sendPushToUser(userId, '🎉 Order Delivered!',
+  `Your vegetables have been delivered. Order #${orderNumber}`,
+  { orderId: String(orderId), type: 'delivery' });</pre>
+  </div>
+
+  <div class="warn">⚠️ The service worker file <code>firebase-messaging-sw.js</code> MUST be in the root of your domain (vegz.online/firebase-messaging-sw.js), not inside /pages/. Place it in the frontend/ folder root.</div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="razorpay">
+  <div class="section-num">Section 03</div>
+  <h2>Razorpay UPI Integration — Customers Pay You</h2>
+
+  <div class="info">💡 Razorpay fee: 2% per transaction (no monthly fee). Free test mode. Supports UPI, PhonePe, GPay, Paytm, net banking, cards.</div>
+
+  <div class="card">
+    <h3>Step 1 — Create Razorpay Account</h3>
+    <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Go to razorpay.com → Sign Up</h4><p>Use your business email and mobile number</p></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Complete KYC</h4><p>Submit: PAN card, Aadhar, bank account details, business proof (GST or Udyam certificate). Takes 1-3 business days.</p></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Get API Keys</h4><p>Dashboard → Settings → API Keys → Generate → Copy Key ID and Key Secret</p></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-body"><h4>Add to .env</h4></div></div>
+    <pre>RAZORPAY_KEY_ID=rzp_live_xxxxxx
+RAZORPAY_KEY_SECRET=xxxxxxxxxxxxxxxxxxxxxx
+RAZORPAY_WEBHOOK_SECRET=your_webhook_secret</pre>
+  </div>
+
+  <div class="card">
+    <h3>Step 2 — Install Razorpay SDK</h3>
+    <pre>cd /var/www/vegz/backend
+npm install razorpay</pre>
+  </div>
+
+  <div class="card">
+    <h3>Step 3 — Backend: Create Order + Verify Payment</h3>
+    <pre>// backend/src/routes/payment.routes.js
+const express  = require('express');
+const Razorpay = require('razorpay');
+const crypto   = require('crypto');
+const { pool } = require('../config/database');
+const { protect } = require('../middleware/auth.middleware');
+const router   = express.Router();
+
+const razorpay = new Razorpay({
+  key_id:     process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
+
+// POST /api/v1/payments/create-order
+router.post('/create-order', protect, async (req, res) => {
+  try {
+    const { orderId } = req.body;
+    const [rows] = await pool.execute('SELECT * FROM orders WHERE id=? AND user_id=?', [orderId, req.user.id]);
+    if (!rows.length) return res.status(404).json({ success:false, message:'Order not found' });
+
+    const order = rows[0];
+    const razorOrder = await razorpay.orders.create({
+      amount:   Math.round(order.total_amount * 100), // in paise
+      currency: 'INR',
+      receipt:  order.order_number,
+      notes:    { order_number: order.order_number, user_mobile: req.user.mobile },
+    });
+
+    res.json({ success:true, data:{
+      razorpayOrderId: razorOrder.id,
+      amount:          razorOrder.amount,
+      currency:        razorOrder.currency,
+      keyId:           process.env.RAZORPAY_KEY_ID,
+      orderNumber:     order.order_number,
+      userName:        req.user.name,
+      userMobile:      req.user.mobile,
+    }});
+  } catch (err) { res.status(500).json({ success:false, message:err.message }); }
+});
+
+// POST /api/v1/payments/verify
+router.post('/verify', protect, async (req, res) => {
+  try {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, orderId } = req.body;
+
+    // Verify signature (CRITICAL security step)
+    const body     = razorpay_order_id + '|' + razorpay_payment_id;
+    const expected = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+                      .update(body).digest('hex');
+
+    if (expected !== razorpay_signature) {
+      return res.status(400).json({ success:false, message:'Payment verification failed' });
+    }
+
+    // Update order as paid
+    await pool.execute(
+      "UPDATE orders SET payment_status='paid', upi_transaction_id=?, status='confirmed' WHERE id=?",
+      [razorpay_payment_id, orderId]
+    );
+
+    res.json({ success:true, message:'Payment verified! Order confirmed.' });
+  } catch (err) { res.status(500).json({ success:false, message:err.message }); }
+});
+
+module.exports = router;</pre>
+  </div>
+
+  <div class="card">
+    <h3>Step 4 — Frontend: Checkout UPI Button</h3>
+    <p>In <code>checkout.html</code>, add inside the UPI card click handler:</p>
+    <pre>&lt;!-- Add this ONCE in your HTML head --&gt;
+&lt;script src="https://checkout.razorpay.com/v1/checkout.js"&gt;&lt;/script&gt;
+
+&lt;!-- Replace the placeOrder function UPI section --&gt;
+&lt;script&gt;
+async function initiateUPIPayment(orderId) {
+  try {
+    // 1. Create Razorpay order on backend
+    const res = await API.req('POST', '/payments/create-order', { orderId });
+    const d = res.data;
+
+    // 2. Open Razorpay checkout
+    const options = {
+      key:         d.keyId,
+      amount:      d.amount,
+      currency:    'INR',
+      name:        'Vegz Private Limited',
+      description: `Order ${d.orderNumber}`,
+      order_id:    d.razorpayOrderId,
+      prefill: { name: d.userName, contact: d.userMobile },
+      theme:   { color: '#22a052' },
+      method:  { upi: true, card: false, netbanking: false, wallet: false },
+      handler: async (response) => {
+        // 3. Verify payment on backend
+        const verify = await API.req('POST', '/payments/verify', {
+          razorpay_order_id:   response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature:  response.razorpay_signature,
+          orderId,
+        });
+        if (verify.success) {
+          sessionStorage.setItem('vegz_last_order', JSON.stringify({ orderNumber: d.orderNumber, totalAmount: d.amount/100, paymentMethod:'upi', status:'confirmed' }));
+          window.location.href = 'order-success.html';
+        }
+      },
+      modal: { ondismiss: () => toast('Payment cancelled. You can retry.', 'error') }
+    };
+    new Razorpay(options).open();
+  } catch (err) { toast(err.message, 'error'); }
+}
+&lt;/script&gt;</pre>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="farmer-payment">
+  <div class="section-num">Section 04</div>
+  <h2>Pay Farmers via UPI — Vegz pays farmers digitally</h2>
+
+  <div class="card">
+    <h3>How it works — The UPI payout flow</h3>
+    <p>Razorpay has a "Payouts" product that lets you send money to any UPI ID programmatically. Cost: ₹2–5 per payout transaction. This is how you pay farmers digitally.</p>
+
+    <h3>Farmer UPI ID collection</h3>
+    <p>In the farmer portal, after they submit a listing, show:</p>
+    <pre>// Add this field to farmer.html Step 3 (Farm Address section)
+&lt;div class="fgroup"&gt;
+  &lt;label&gt;Your UPI ID for Payment &lt;span class="kn"&gt;· ಪಾವತಿಗಾಗಿ UPI ID&lt;/span&gt; *&lt;/label&gt;
+  &lt;input type="text" id="f-upi" placeholder="mobilenumber@upi or yourname@paytm"&gt;
+  &lt;div class="fhint"&gt;
+    We will send payment to this UPI ID after collecting your vegetables.
+    ನಾವು ತರಕಾರಿ ಸಂಗ್ರಹಿಸಿದ ನಂತರ ಈ UPI ID ಗೆ ಪಾವತಿ ಕಳುಹಿಸುತ್ತೇವೆ.&lt;br&gt;
+    &lt;strong&gt;Examples:&lt;/strong&gt; 9008015017@paytm · basavaraj@ybl · 9008015017@upi
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+
+    <h3>Option A — Manual UPI payment (Start with this, no setup needed)</h3>
+    <p>When admin marks a farmer listing as "Collected":</p>
+    <ol style="margin:12px 0 0 20px">
+      <li>Admin sees farmer's UPI ID on the dashboard</li>
+      <li>Admin opens PhonePe / GPay on their phone</li>
+      <li>Sends payment to farmer's UPI ID</li>
+      <li>Enters UTR (transaction reference) in admin dashboard → clicks "Mark Paid"</li>
+      <li>System records payment and updates farmer's listing status to "Paid"</li>
+    </ol>
+    <div class="success">✅ This works today with ZERO setup. Start with this.</div>
+
+    <h3>Option B — Automated UPI payout via Razorpay (Phase 2)</h3>
+    <pre># Install Razorpay on backend (already done if you did Option A for customers)
+npm install razorpay
+
+# Add to .env:
+RAZORPAY_PAYOUT_KEY=rzp_live_xxxxxx
+RAZORPAY_PAYOUT_SECRET=xxxxxxxxxxxx
+RAZORPAY_ACCOUNT_NUMBER=your_razorpay_current_account</pre>
+
+    <pre>// backend: Send payout to farmer UPI
+const Razorpay = require('razorpay');
+const client = new Razorpay({
+  key_id: process.env.RAZORPAY_PAYOUT_KEY,
+  key_secret: process.env.RAZORPAY_PAYOUT_SECRET,
+});
+
+async function payFarmerUPI(farmerName, upiId, amountRs, listingNumber) {
+  const payout = await client.payouts.create({
+    account_number: process.env.RAZORPAY_ACCOUNT_NUMBER,
+    amount:         Math.round(amountRs * 100), // in paise
+    currency:       'INR',
+    mode:           'UPI',
+    purpose:        'vendor_advance',
+    fund_account: {
+      account_type: 'vpa',
+      vpa:          { address: upiId }, // farmer's UPI ID
+      contact: {
+        name:    farmerName,
+        type:    'vendor',
+        contact: null,
+      }
+    },
+    narration: `Vegz payment for ${listingNumber}`,
+  });
+  return payout;
+}</pre>
+
+    <div class="warn">⚠️ Razorpay Payouts requires: Razorpay Current Account (open one free at razorpay.com/current-account) + add money to it + complete additional KYC. Start with manual UPI payments first.</div>
+  </div>
+
+  <div class="card">
+    <h3>For farmers without UPI — what to do?</h3>
+    <table class="table">
+      <tr><th>Situation</th><th>Solution</th></tr>
+      <tr><td>Farmer has smartphone</td><td>Install PhonePe or GPay → link Aadhar-linked bank → get UPI ID automatically</td></tr>
+      <tr><td>Farmer has basic phone only</td><td>Pay to their family member's UPI, or IMPS bank transfer</td></tr>
+      <tr><td>Farmer wants cash</td><td>Agent carries cash, pays on spot, records in admin system</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="admin">
+  <div class="section-num">Section 05</div>
+  <h2>Admin Dashboard — Credentials + Security</h2>
+
+  <div class="card">
+    <h3>Create Admin Password (MUST do before going live)</h3>
+    <p>The database seeds a placeholder admin. You need to set the real password hash:</p>
+    <pre># On any machine with Node.js installed:
+node -e "require('bcryptjs').hash('YourNewStrongPassword@2025', 12, (err, hash) => console.log(hash))"
+
+# Copy the hash output, then update in MySQL:
+mysql -u vegz_user -p vegz_db
+
+UPDATE admin_users 
+SET password_hash='PASTE_HASH_HERE', email='admin@vegz.online', mobile='+91YOURMOBILE' 
+WHERE email='admin@vegz.online';
+EXIT;</pre>
+
+    <h3>Admin credentials to remember</h3>
+    <pre>URL:      https://admin.vegz.online
+Email:    admin@vegz.online
+Password: (whatever you set above)
+
+NEVER share these with anyone.
+Token expires in 12 hours — login again each day.</pre>
+
+    <h3>Security: Why other users can't access admin</h3>
+    <ul>
+      <li>Admin routes require a JWT token with <code>type: "admin"</code> — customer tokens don't work</li>
+      <li>Admin login is email + password — not mobile OTP like customers</li>
+      <li>Admin page is on a separate domain (admin.vegz.online) served from different Nginx block</li>
+      <li>Even if someone finds the URL, they need the email + password to get in</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="ec2">
+  <div class="section-num">Section 06</div>
+  <h2>AWS EC2 — 4 Domains, 2 Servers</h2>
+
+  <div class="card">
+    <h3>Architecture</h3>
+    <div class="arch">
+      <div class="arch-box">vegz.online<br><small style="color:rgba(255,255,255,.5)">Customer site</small></div>
+      <div class="arch-arr">→</div>
+      <div class="arch-box">www.vegz.online<br><small style="color:rgba(255,255,255,.5)">Redirect</small></div>
+      <div class="arch-arr">→</div>
+      <div class="arch-box">farmer.vegz.online<br><small style="color:rgba(255,255,255,.5)">Farmer portal</small></div>
+      <div class="arch-arr">→</div>
+      <div class="arch-box">admin.vegz.online<br><small style="color:rgba(255,255,255,.5)">Admin dashboard</small></div>
+      <div class="arch-arr">→</div>
+      <div class="arch-box">api.vegz.online<br><small style="color:rgba(255,255,255,.5)">Backend API</small></div>
+      <br>All point to <strong>Server 1 IP</strong> · MySQL on Server 2
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Step 1 — DNS Records (add all 5 in your registrar)</h3>
+    <table class="table">
+      <tr><th>Type</th><th>Name</th><th>Value</th></tr>
+      <tr><td>A</td><td>@</td><td>SERVER1_PUBLIC_IP</td></tr>
+      <tr><td>A</td><td>www</td><td>SERVER1_PUBLIC_IP</td></tr>
+      <tr><td>A</td><td>farmer</td><td>SERVER1_PUBLIC_IP</td></tr>
+      <tr><td>A</td><td>admin</td><td>SERVER1_PUBLIC_IP</td></tr>
+      <tr><td>A</td><td>api</td><td>SERVER1_PUBLIC_IP</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Step 2 — Nginx config (replace your existing /etc/nginx/sites-available/vegz)</h3>
+    <pre>sudo nano /etc/nginx/sites-available/vegz</pre>
+    <pre># ── vegz.online — Main customer website ──────────────────
+server {
+    listen 80;
+    server_name vegz.online www.vegz.online;
+    root /var/www/vegz/frontend;
+    index index.html;
+
+    gzip on;
+    gzip_types text/plain text/css application/javascript application/json;
+
+    # Service worker must be accessible at root
+    location /firebase-messaging-sw.js {
+        add_header Cache-Control "no-cache";
+    }
+
+    location ~* \.(css|js|jpg|jpeg|png|gif|ico|svg|woff2)$ {
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location / {
+        try_files $uri $uri/ $uri.html /index.html;
+    }
+}
+
+# ── farmer.vegz.online — Farmer portal ───────────────────
+server {
+    listen 80;
+    server_name farmer.vegz.online;
+    root /var/www/vegz/frontend;
+    index pages/farmer.html;
+
+    location / {
+        try_files $uri /pages/farmer.html;
+    }
+}
+
+# ── admin.vegz.online — Admin dashboard ──────────────────
+server {
+    listen 80;
+    server_name admin.vegz.online;
+    root /var/www/vegz/frontend;
+    index pages/admin.html;
+
+    # Extra security header for admin
+    add_header X-Robots-Tag "noindex, nofollow" always;
+    add_header X-Frame-Options "DENY" always;
+
+    location / {
+        try_files $uri /pages/admin.html;
+    }
+}
+
+# ── api.vegz.online — Backend API ────────────────────────
+server {
+    listen 80;
+    server_name api.vegz.online;
+    client_max_body_size 10M;
+
+    location / {
+        proxy_pass         http://127.0.0.1:5001;
+        proxy_http_version 1.1;
+        proxy_set_header   Upgrade $http_upgrade;
+        proxy_set_header   Connection 'upgrade';
+        proxy_set_header   Host $host;
+        proxy_set_header   X-Real-IP $remote_addr;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_read_timeout 60s;
+    }
+}</pre>
+    <pre>sudo nginx -t && sudo systemctl restart nginx</pre>
+  </div>
+
+  <div class="card">
+    <h3>Step 3 — SSL for all 5 domains (one command)</h3>
+    <pre>sudo certbot --nginx \
+  -d vegz.online \
+  -d www.vegz.online \
+  -d farmer.vegz.online \
+  -d admin.vegz.online \
+  -d api.vegz.online \
+  --email hello@vegz.online \
+  --agree-tos \
+  --non-interactive
+
+sudo systemctl restart nginx</pre>
+    <div class="success">✅ All 5 domains now have HTTPS. Free. Auto-renews.</div>
+  </div>
+
+  <div class="card">
+    <h3>Step 4 — folder structure on Server 1</h3>
+    <pre>/var/www/vegz/
+├── frontend/
+│   ├── index.html              ← vegz.online
+│   ├── firebase-messaging-sw.js← Push notifications (place at root!)
+│   ├── css/ js/
+│   └── pages/
+│       ├── shop.html           ← vegz.online/pages/shop.html
+│       ├── checkout.html
+│       ├── farmer.html         ← farmer.vegz.online
+│       ├── admin.html          ← admin.vegz.online
+│       └── orders.html
+└── backend/
+    ├── src/
+    │   ├── server.js
+    │   ├── routes/
+    │   │   ├── auth.routes.js
+    │   │   ├── farmer.routes.js   ← NEW
+    │   │   ├── admin.routes.js    ← NEW
+    │   │   ├── payment.routes.js  ← NEW (Razorpay)
+    │   │   └── ...
+    │   └── services/
+    │       ├── otp.service.js
+    │       └── notification.service.js  ← NEW (FCM)
+    └── .env</pre>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="db-sql">
+  <div class="section-num">Section 07</div>
+  <h2>Run New Database Tables</h2>
+  <div class="card">
+    <h3>Order of SQL files to run</h3>
+    <pre># Only if starting fresh:
+mysql -u vegz_user -p vegz_db &lt; database/001_create_all_tables.sql
+mysql -u vegz_user -p vegz_db &lt; database/002_seed_data.sql
+
+# Always run this (adds farmer + admin + push token tables):
+mysql -u vegz_user -p vegz_db &lt; database/003_farmer_admin_tables.sql
+
+# Verify:
+mysql -u vegz_user -p vegz_db -e "SHOW TABLES;"</pre>
+    <p>Expected tables after all 3 files:</p>
+    <pre>admin_users | app_settings | categories | farmer_listing_items | farmer_listings
+notifications | orders | order_items | order_status_history
+products | product_quantity_options | push_tokens
+stock_levels | user_addresses | users | otp_sessions</pre>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="errors">
+  <div class="section-num">Section 08</div>
+  <h2>Common Errors and Fixes</h2>
+  <div class="card">
+    <table class="table">
+      <tr><th>Error</th><th>Cause</th><th>Fix</th></tr>
+      <tr><td>Farmer submit "Not Found"</td><td>farmer.routes.js not in backend</td><td>Upload file + pm2 restart</td></tr>
+      <tr><td>Admin login "Invalid credentials"</td><td>Password hash not set</td><td>Run UPDATE admin_users query above</td></tr>
+      <tr><td>Push notifications not working</td><td>Service worker not at root</td><td>Place firebase-messaging-sw.js in frontend/ root, not in pages/</td></tr>
+      <tr><td>Razorpay "key_id not found"</td><td>.env not loaded</td><td>pm2 restart vegz-api after editing .env</td></tr>
+      <tr><td>farmer.vegz.online shows 404</td><td>Nginx config missing</td><td>Add farmer server block, nginx -t, restart nginx</td></tr>
+      <tr><td>SSL certificate error for new domain</td><td>Certbot not run for new subdomain</td><td>Run certbot command again with all domains listed</td></tr>
+      <tr><td>admin.vegz.online can't reach API</td><td>CORS not allowing admin domain</td><td>Add admin.vegz.online to CORS_ORIGINS in .env</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Update CORS for all domains</h3>
+    <pre># In /var/www/vegz/backend/.env:
+CORS_ORIGINS=https://vegz.online,https://www.vegz.online,https://farmer.vegz.online,https://admin.vegz.online
+
+# Restart:
+pm2 restart vegz-api</pre>
+  </div>
+
+  <div class="card">
+    <h3>Quick health check after deploy</h3>
+    <pre>curl https://api.vegz.online/health              # API running?
+curl https://vegz.online                         # Customer site?
+curl https://farmer.vegz.online                  # Farmer portal?
+curl https://admin.vegz.online                   # Admin dashboard?
+pm2 status                                        # vegz-api online?
+pm2 logs vegz-api --lines 30                     # Any errors?</pre>
+  </div>
+</div>
+
+<div style="text-align:center;padding:48px 0;color:var(--muted);font-size:14px;border-top:1px solid var(--border);margin-top:40px">
+  Vegz Private Limited — Implementation Guide · vegz.online<br>
+  Generated for internal use — do not share publicly
+</div>
+
+</div><!-- /container -->
+</body>
+</html>

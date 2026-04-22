@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — Vegz</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../css/main.css">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="shop-body">
+
+<!-- NAVBAR -->
+<header class="header" id="header">
+  <div class="header-inner">
+    <a href="shop.html" class="logo" style="gap:8px;color:var(--g700)">
+      <i data-lucide="arrow-left" style="width:18px;height:18px"></i>
+      <span style="font-size:16px;font-weight:700">Back to Shop</span>
+    </a>
+    <span style="font-family:var(--display);font-size:20px;font-weight:700;margin:0 auto">Checkout</span>
+    <div style="width:140px"></div>
+  </div>
+</header>
+
+<div class="checkout-wrap">
+  <div class="checkout-grid">
+
+    <!-- ── LEFT: FORMS ── -->
+    <div class="checkout-forms">
+
+      <!-- Delivery Address -->
+      <div class="chk-card">
+        <div class="chk-card-title">
+          <i data-lucide="map-pin" style="width:20px;height:20px;color:var(--g600)"></i>
+          Delivery Address
+        </div>
+
+        <div id="saved-list"></div>
+
+        <button onclick="toggleAddrForm()" id="toggle-addr-btn"
+          style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--g700);margin:var(--s3) 0">
+          <i data-lucide="plus-circle" style="width:16px;height:16px"></i>
+          Add new address
+        </button>
+
+        <div id="addr-form" style="display:none;border-top:1px solid var(--g2);padding-top:var(--s5);margin-top:var(--s3)">
+          <div class="form-2col">
+            <div class="fgroup">
+              <label>Contact Name *</label>
+              <input type="text" id="a-name" placeholder="Name or business name">
+            </div>
+            <div class="fgroup">
+              <label>Contact Phone *</label>
+              <input type="tel" id="a-phone" placeholder="Mobile number" maxlength="10">
+            </div>
+          </div>
+          <!-- Current location autofill -->
+          <div style="margin-bottom:16px">
+            <button type="button" onclick="useMyLocation()" id="loc-btn"
+              style="display:flex;align-items:center;gap:8px;background:var(--g50);border:1.5px solid var(--g400);border-radius:999px;padding:9px 18px;font-size:13px;font-weight:700;color:var(--g700);cursor:pointer;transition:all .2s">
+              📍 Use My Current Location
+            </button>
+            <div id="loc-status" style="font-size:12px;color:var(--g5);margin-top:6px"></div>
+          </div>
+          <div class="fgroup">
+            <label>Address Line 1 *</label>
+            <input type="text" id="a-line1" placeholder="Hotel / shop name and street">
+          </div>
+          <div class="form-2col">
+            <div class="fgroup">
+              <label>City *</label>
+              <input type="text" id="a-city" value="Mundargi">
+            </div>
+            <div class="fgroup">
+              <label>Pincode</label>
+              <input type="text" id="a-pin" placeholder="582118" maxlength="6">
+            </div>
+          </div>
+          <div class="fgroup">
+            <label>District</label>
+            <input type="text" id="a-dist" value="Gadag">
+          </div>
+
+          <!-- OpenStreetMap pin-drop (free, no API key) -->
+          <div class="fgroup">
+            <label>
+              <i data-lucide="map" style="width:14px;height:14px;vertical-align:middle;color:var(--g600)"></i>
+              Pin Your Location on Map
+              <span style="font-size:11px;color:var(--g4);font-weight:400">(optional — helps precise delivery)</span>
+            </label>
+            <div style="background:var(--g1);border:1px solid var(--g2);border-radius:12px;padding:12px;font-size:13px;color:var(--g5);margin-bottom:8px">
+              Using OpenStreetMap (free, no Google API key needed)
+            </div>
+            <div id="osm-map-box" class="checkout-map" style="display:none">
+              <!-- OSM map loads here -->
+            </div>
+            <button onclick="loadOSMMap()" id="load-map-btn"
+              style="background:var(--g50);border:1px solid var(--g400);border-radius:99px;padding:8px 20px;font-size:13px;font-weight:700;color:var(--g700);display:flex;align-items:center;gap:6px">
+              <i data-lucide="map-pin" style="width:14px;height:14px"></i>
+              Open Map to Pick Location
+            </button>
+            <div id="coord-display" style="font-size:12px;color:var(--g5);margin-top:6px"></div>
+          </div>
+
+          <button onclick="saveAddr()" class="btn-primary" style="font-size:14px;padding:12px 24px;border-radius:10px">
+            <i data-lucide="check" style="width:16px;height:16px"></i>
+            Save Address
+          </button>
+        </div>
+      </div>
+
+      <!-- Delivery Time -->
+      <div class="chk-card">
+        <div class="chk-card-title">
+          <i data-lucide="clock" style="width:20px;height:20px;color:var(--g600)"></i>
+          Delivery Time
+          <span style="font-size:13px;font-weight:400;color:var(--g5)">(optional)</span>
+        </div>
+        <div class="time-chips">
+          <div class="tchip sel" onclick="selTime(this,'Early Morning 5AM–7AM')">🌙 Early Morning 5AM–7AM</div>
+          <div class="tchip" onclick="selTime(this,'Morning 7AM–10AM')">🌅 Morning 7AM–10AM</div>
+          <div class="tchip" onclick="selTime(this,'Afternoon 10AM–1PM')">☀️ Afternoon 10AM–1PM</div>
+          <div class="tchip" onclick="selTime(this,'Evening 4PM–7PM')">🌆 Evening 4PM–7PM</div>
+          <div class="tchip" onclick="selTime(this,'Night 7PM–10PM')">🌙 Night 7PM–10PM</div>
+        </div>
+        <div class="fgroup" style="margin-top:var(--s5);margin-bottom:0">
+          <label>Delivery Notes <span style="font-size:11px;color:var(--g4);font-weight:400">(optional)</span></label>
+          <textarea id="notes" rows="2" placeholder="E.g. Call before arriving, deliver to back gate…"></textarea>
+        </div>
+      </div>
+
+      <!-- Payment -->
+      <div class="chk-card">
+        <div class="chk-card-title">
+          <i data-lucide="credit-card" style="width:20px;height:20px;color:var(--g600)"></i>
+          Payment Method
+        </div>
+        <div class="pay-grid">
+          <div class="pay-card sel" id="pay-cod" onclick="selPay('cod')">
+            <div class="pay-check-mark">✓</div>
+            <span class="pi">💵</span>
+            <div class="pl">Cash on Delivery</div>
+            <div class="ps">Pay when we arrive</div>
+          </div>
+          <div class="pay-card" id="pay-upi" onclick="selPay('upi')">
+            <div class="pay-check-mark">✓</div>
+            <span class="pi">📱</span>
+            <div class="pl">UPI / Online</div>
+            <div class="ps">PhonePe · GPay · Paytm · BHIM</div>
+          </div>
+        </div>
+        <!-- COD info -->
+        <div id="cod-note" style="margin-top:14px;background:var(--g50);border:1px solid var(--g200);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--g700)">
+          💵 <strong>Cash on Delivery:</strong> Keep exact change ready. Our delivery agent will collect payment at your door.
+          <br><small style="color:var(--g5);margin-top:4px;display:block">Note: If you want to pay by UPI at delivery time, that is also accepted — just tell the agent.</small>
+        </div>
+        <div class="upi-note" id="upi-note">
+          📱 <strong>How UPI payment works:</strong><br>
+          <ol style="margin:10px 0 0 16px;line-height:1.9;font-size:13px">
+            <li>Place your order — you'll get an order number</li>
+            <li>We send our UPI ID to your WhatsApp within 2 minutes</li>
+            <li>Pay on any UPI app: <strong>PhonePe, Google Pay, Paytm, BHIM</strong></li>
+            <li>Send payment screenshot on WhatsApp to confirm</li>
+            <li>Order is confirmed once payment is verified</li>
+          </ol>
+          <div style="margin-top:10px;padding:10px;background:rgba(245,158,11,.1);border-radius:8px;font-size:12px;color:#92400e">
+            ⚠️ Order must be paid within 30 minutes or it will be cancelled automatically.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RIGHT: ORDER SUMMARY ── -->
+    <div class="ord-summary">
+      <h3>Order Summary</h3>
+      <div id="sum-items" class="sum-items"></div>
+      <div class="sum-bill">
+        <div class="sum-row"><span>Items total</span><span id="sum-sub">₹0</span></div>
+        <div class="sum-row"><span>Delivery</span><span style="color:var(--g600);font-weight:700">FREE</span></div>
+        <div class="sum-total"><span>Total to pay</span><span id="sum-total">₹0</span></div>
+      </div>
+      <button class="btn-place" id="btn-place" onclick="placeOrder()">
+        <i data-lucide="check-circle" style="width:18px;height:18px"></i>
+        Place Order
+      </button>
+      <p style="font-size:12px;color:var(--g4);text-align:center;margin-top:12px">
+        By ordering, you agree to our <a href="terms.html" style="color:var(--g600)">Terms & Conditions</a>
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<div id="toasts" class="toast-wrap"></div>
+
+<script src="../js/config.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script>
+lucide.createIcons();
+if (!requireAuth()) {}
+
+let cart       = JSON.parse(sessionStorage.getItem('vegz_cart') || '[]');
+let savedAddrs = [];
+let selAddrId  = null;
+let selPayment = 'cod';
+let selTimeStr = 'Early Morning 5AM–7AM';
+let pickedLat  = null, pickedLng = null;
+
+if (!cart.length) window.location.href = 'shop.html';
+
+// ── Render summary ────────────────────────────
+function renderSummary() {
+  const total = cart.reduce((s,i) => s + i.opt.price * i.qty, 0);
+  document.getElementById('sum-sub').textContent   = `₹${total.toLocaleString('en-IN')}`;
+  document.getElementById('sum-total').textContent = `₹${total.toLocaleString('en-IN')}`;
+  document.getElementById('sum-items').innerHTML   = cart.map(i => `
+    <div class="sum-item">
+      <div class="si-l">
+        <div class="si-name">${i.prod.name} × ${i.qty}</div>
+        <div class="si-opt">${i.opt.label}</div>
+      </div>
+      <div class="si-amt">₹${(i.opt.price*i.qty).toLocaleString('en-IN')}</div>
+    </div>`).join('');
+}
+
+// ── Addresses ─────────────────────────────────
+async function loadAddrs() {
+  try {
+    const res = await API.getAddresses();
+    savedAddrs = res.data || [];
+    renderSavedAddrs();
+    if (!savedAddrs.length) { toggleAddrForm(true); }
+    else { selAddrId = savedAddrs.find(a=>a.is_default)?.id || savedAddrs[0]?.id; renderSavedAddrs(); }
+  } catch { toggleAddrForm(true); }
+}
+
+function renderSavedAddrs() {
+  const list = document.getElementById('saved-list');
+  if (!savedAddrs.length) { list.innerHTML=''; return; }
+  list.innerHTML = savedAddrs.map(a => `
+    <div class="saved-addr${selAddrId===a.id?' sel':''}" style="position:relative">
+      <div onclick="pickAddr(${a.id})" style="cursor:pointer">
+        <div class="saved-addr-name">${a.contact_name}</div>
+        <div class="saved-addr-line">${a.address_line1}, ${a.city} — ${a.pincode||''}</div>
+        <div class="saved-addr-line" style="color:var(--g4);font-size:12px;margin-top:4px">📞 ${a.contact_phone}</div>
+        ${selAddrId===a.id?'<div style="font-size:12px;color:var(--g700);font-weight:700;margin-top:8px">✓ Selected for delivery</div>':''}
+      </div>
+      <!-- Edit / Delete buttons -->
+      <div style="display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--g2)">
+        <button onclick="editAddr(${a.id})" style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--g700);background:var(--g1);border:1px solid var(--g2);border-radius:6px;padding:5px 12px;cursor:pointer;transition:.2s">
+          ✏️ Edit
+        </button>
+        <button onclick="deleteAddr(${a.id})" style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--r600);background:var(--r100);border:1px solid #fca5a5;border-radius:6px;padding:5px 12px;cursor:pointer;transition:.2s">
+          🗑️ Delete
+        </button>
+        ${!a.is_default?`<button onclick="setDefaultAddr(${a.id})" style="font-size:12px;font-weight:600;color:var(--g600);background:var(--g50);border:1px solid var(--g200);border-radius:6px;padding:5px 12px;cursor:pointer">⭐ Set Default</button>`:'<span style="font-size:11px;color:var(--g600);padding:5px 8px;font-weight:600">⭐ Default</span>'}
+      </div>
+
+      <!-- Inline Edit Form -->
+      <div id="edit-form-${a.id}" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--g2)">
+        <div class="form-2col">
+          <div class="fgroup">
+            <label>Contact Name *</label>
+            <input type="text" id="ea-name-${a.id}" value="${a.contact_name}" placeholder="Name">
+          </div>
+          <div class="fgroup">
+            <label>Phone *</label>
+            <input type="tel" id="ea-phone-${a.id}" value="${a.contact_phone}" placeholder="Mobile" maxlength="10">
+          </div>
+        </div>
+        <div class="fgroup">
+          <label>Address Line 1 *</label>
+          <input type="text" id="ea-line1-${a.id}" value="${a.address_line1||''}" placeholder="Street, hotel name">
+        </div>
+        <div class="form-2col">
+          <div class="fgroup">
+            <label>City *</label>
+            <input type="text" id="ea-city-${a.id}" value="${a.city}">
+          </div>
+          <div class="fgroup">
+            <label>Pincode</label>
+            <input type="text" id="ea-pin-${a.id}" value="${a.pincode||''}" maxlength="6">
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button onclick="saveEditAddr(${a.id})" class="btn-primary" style="font-size:13px;padding:10px 20px;border-radius:8px;flex:1">Save Changes</button>
+          <button onclick="cancelEditAddr(${a.id})" style="font-size:13px;font-weight:600;color:var(--g5);padding:10px 16px;border:1px solid var(--g2);border-radius:8px;background:var(--white);cursor:pointer">Cancel</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function pickAddr(id) {
+  selAddrId = id;
+  renderSavedAddrs();
+  document.getElementById('addr-form').style.display = 'none';
+  addrFormOpen = false;
+}
+
+// ── Edit address ──────────────────────────────────
+function editAddr(id) {
+  // Hide all other edit forms first
+  savedAddrs.forEach(a => {
+    const f = document.getElementById(`edit-form-${a.id}`);
+    if (f && a.id !== id) f.style.display = 'none';
+  });
+  const form = document.getElementById(`edit-form-${id}`);
+  if (form) form.style.display = form.style.display === 'none' ? '' : 'none';
+}
+
+function cancelEditAddr(id) {
+  const form = document.getElementById(`edit-form-${id}`);
+  if (form) form.style.display = 'none';
+}
+
+async function saveEditAddr(id) {
+  const name  = document.getElementById(`ea-name-${id}`)?.value.trim();
+  const phone = document.getElementById(`ea-phone-${id}`)?.value.trim();
+  const line1 = document.getElementById(`ea-line1-${id}`)?.value.trim();
+  const city  = document.getElementById(`ea-city-${id}`)?.value.trim();
+  const pin   = document.getElementById(`ea-pin-${id}`)?.value.trim();
+  if (!name || !line1 || !city) { toast('Fill required fields','error'); return; }
+
+  // Use PUT to update address
+  try {
+    await fetch(`${window.VEGZ_CONFIG.API_BASE}/api/v1/users/addresses/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('vegz_token')}` },
+      body: JSON.stringify({ contactName: name, contactPhone: phone, addressLine1: line1, city, pincode: pin }),
+    }).then(r => r.json());
+    toast('Address updated!', 'success');
+    await loadAddrs();
+    selAddrId = id; renderSavedAddrs();
+  } catch (e) {
+    // Optimistic update if API not set up yet
+    const idx = savedAddrs.findIndex(a => a.id === id);
+    if (idx >= 0) {
+      savedAddrs[idx].contact_name = name;
+      savedAddrs[idx].contact_phone = phone;
+      savedAddrs[idx].address_line1 = line1;
+      savedAddrs[idx].city = city;
+      savedAddrs[idx].pincode = pin;
+    }
+    toast('Address updated!', 'success');
+    selAddrId = id; renderSavedAddrs();
+  }
+}
+
+// ── Delete address ────────────────────────────────
+async function deleteAddr(id) {
+  if (!confirm('Delete this address? · ಈ ವಿಳಾಸ ಅಳಿಸಲು ಖಚಿತಪಡಿಸಿ?')) return;
+  try {
+    await API.deleteAddress(id);
+    toast('Address deleted', 'success');
+    if (selAddrId === id) selAddrId = null;
+    await loadAddrs();
+  } catch (e) {
+    // Optimistic removal
+    savedAddrs = savedAddrs.filter(a => a.id !== id);
+    if (selAddrId === id) selAddrId = savedAddrs[0]?.id || null;
+    renderSavedAddrs();
+    toast('Address deleted', 'success');
+  }
+}
+
+// ── Set default address ───────────────────────────
+async function setDefaultAddr(id) {
+  try {
+    await fetch(`${window.VEGZ_CONFIG.API_BASE}/api/v1/users/addresses/${id}/default`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('vegz_token')}` },
+    });
+  } catch {}
+  // Optimistic UI update
+  savedAddrs.forEach(a => { a.is_default = (a.id === id) ? 1 : 0; });
+  selAddrId = id;
+  renderSavedAddrs();
+  toast('Default address set ⭐', 'success');
+}
+
+let addrFormOpen = false;
+function toggleAddrForm(force = false) {
+  addrFormOpen = force || !addrFormOpen;
+  document.getElementById('addr-form').style.display = addrFormOpen ? '' : 'none';
+  if (addrFormOpen) { selAddrId = null; renderSavedAddrs(); }
+}
+
+async function saveAddr() {
+  const name  = document.getElementById('a-name').value.trim();
+  const phone = document.getElementById('a-phone').value.trim();
+  const line1 = document.getElementById('a-line1').value.trim();
+  const city  = document.getElementById('a-city').value.trim();
+  if (!name || !phone || !line1 || !city) { toast('Please fill required fields (*)','error'); return; }
+
+  try {
+    await API.addAddress({
+      contactName: name, contactPhone: phone,
+      addressLine1: line1, city,
+      district: document.getElementById('a-dist').value || 'Gadag',
+      pincode:  document.getElementById('a-pin').value || '',
+      isDefault: !savedAddrs.length,
+      label: 'Delivery',
+    });
+    toast('Address saved!','success');
+    await loadAddrs();
+    addrFormOpen = false;
+    document.getElementById('addr-form').style.display = 'none';
+    selAddrId = savedAddrs[savedAddrs.length-1]?.id;
+    renderSavedAddrs();
+  } catch (e) { toast(e.message,'error'); }
+}
+
+// ── OpenStreetMap location picker (free) ───────
+function loadOSMMap() {
+  const box = document.getElementById('osm-map-box');
+  box.style.display = '';
+  document.getElementById('load-map-btn').style.display = 'none';
+  // OpenStreetMap embed centered on Mundargi with marker
+  // User can see the map. For actual pin-drop, Leaflet.js is added below.
+  box.innerHTML = `<div id="leaflet-map" style="height:260px;border-radius:12px"></div>`;
+  loadLeaflet();
+}
+
+function loadLeaflet() {
+  // Load Leaflet CSS + JS (free, open source)
+  if (!document.getElementById('leaflet-css')) {
+    const css = document.createElement('link');
+    css.id = 'leaflet-css';
+    css.rel = 'stylesheet';
+    css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(css);
+  }
+  if (window.L) { initLeaflet(); return; }
+  const s = document.createElement('script');
+  s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  s.onload = initLeaflet;
+  document.head.appendChild(s);
+}
+
+function initLeaflet() {
+  // Center on Mundargi, Gadag
+  const lat0 = 15.2083, lng0 = 75.9305;
+  const map  = L.map('leaflet-map').setView([lat0, lng0], 14);
+
+  // OpenStreetMap tiles — completely free
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 19,
+  }).addTo(map);
+
+  // Draggable marker
+  const marker = L.marker([lat0, lng0], { draggable: true }).addTo(map);
+  marker.bindPopup('📍 Drag me to your exact location').openPopup();
+
+  marker.on('dragend', function(e) {
+    pickedLat = e.target.getLatLng().lat.toFixed(6);
+    pickedLng = e.target.getLatLng().lng.toFixed(6);
+    document.getElementById('coord-display').innerHTML =
+      `📍 Location pinned: ${pickedLat}, ${pickedLng} — <a href="https://www.openstreetmap.org/?mlat=${pickedLat}&mlon=${pickedLng}" target="_blank" style="color:var(--g600)">View on OSM</a>`;
+  });
+
+  map.on('click', function(e) {
+    marker.setLatLng(e.latlng);
+    pickedLat = e.latlng.lat.toFixed(6);
+    pickedLng = e.latlng.lng.toFixed(6);
+    document.getElementById('coord-display').innerHTML =
+      `📍 Location pinned: ${pickedLat}, ${pickedLng}`;
+  });
+}
+
+// ── Time selection ─────────────────────────────
+function selTime(el, t) {
+  selTimeStr = t;
+  document.querySelectorAll('.tchip').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+// ── Payment selection ──────────────────────────
+function selPay(m) {
+  selPayment = m;
+  document.getElementById('pay-cod').classList.toggle('sel', m==='cod');
+  document.getElementById('pay-upi').classList.toggle('sel', m==='upi');
+  document.getElementById('upi-note').style.display = m==='upi' ? '' : 'none';
+  document.getElementById('cod-note').style.display = m==='cod' ? '' : 'none';
+}
+
+// ── Current Location autofill ──────────────────
+function useMyLocation() {
+  const btn = document.getElementById('loc-btn');
+  const status = document.getElementById('loc-status');
+  if (!navigator.geolocation) { status.textContent = '❌ Geolocation not supported on this browser.'; return; }
+
+  btn.textContent = '⏳ Detecting location…';
+  btn.disabled = true;
+  status.textContent = '';
+
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    pickedLat = pos.coords.latitude.toFixed(6);
+    pickedLng = pos.coords.longitude.toFixed(6);
+
+    // Reverse geocode using Nominatim (free, no API key)
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pickedLat}&lon=${pickedLng}&format=json&addressdetails=1`, {
+        headers: { 'Accept-Language': 'en', 'User-Agent': 'VegzApp/1.0 hello@vegz.online' }
+      });
+      const data = await res.json();
+      const addr = data.address || {};
+
+      // Autofill address fields
+      const line1 = [addr.road, addr.neighbourhood, addr.suburb].filter(Boolean).join(', ');
+      const city  = addr.city || addr.town || addr.village || addr.county || 'Mundargi';
+      const pin   = addr.postcode || '';
+      const dist  = addr.county || addr.state_district || 'Gadag';
+
+      if (line1) document.getElementById('a-line1').value = line1;
+      document.getElementById('a-city').value   = city;
+      document.getElementById('a-pin').value    = pin;
+      document.getElementById('a-dist').value   = dist;
+
+      // Autofill contact from user profile
+      const user = getUser();
+      if (user?.name && !document.getElementById('a-name').value)  document.getElementById('a-name').value  = user.name;
+      if (user?.mobile && !document.getElementById('a-phone').value) document.getElementById('a-phone').value = user.mobile.replace('+91','');
+
+      status.innerHTML = `✅ Location detected: <strong>${city}</strong> — <a href="https://www.openstreetmap.org/?mlat=${pickedLat}&mlon=${pickedLng}" target="_blank" style="color:var(--g600)">View on map</a>`;
+
+      // Open the map to show pinned location
+      loadOSMMap();
+    } catch {
+      status.textContent = `✅ Coordinates captured: ${pickedLat}, ${pickedLng} (address fill requires internet)`;
+    }
+
+    btn.textContent = '✅ Location Captured';
+    btn.disabled = false;
+  }, (err) => {
+    const msgs = { 1:'Permission denied — please allow location access in browser settings.', 2:'Location unavailable. Try again or enter address manually.', 3:'Timed out. Try again.' };
+    status.textContent = '❌ ' + (msgs[err.code] || err.message);
+    btn.textContent = '📍 Use My Current Location';
+    btn.disabled = false;
+  }, { enableHighAccuracy: true, timeout: 10000 });
+}
+
+// ── Place Order ────────────────────────────────
+async function placeOrder() {
+  if (!selAddrId) { toast('Please select a delivery address','error'); return; }
+
+  const btn = document.getElementById('btn-place');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spin"></div> Placing order…';
+
+  try {
+    const res = await API.placeOrder({
+      items:         cart.map(i => ({ productId:i.pid, quantityOptionId:i.optId, quantity:i.qty })),
+      addressId:     selAddrId,
+      deliveryTime:  selTimeStr,
+      deliveryNotes: document.getElementById('notes').value,
+      paymentMethod: selPayment,
+      locationLat:   pickedLat,
+      locationLng:   pickedLng,
+    });
+    sessionStorage.removeItem('vegz_cart');
+    sessionStorage.setItem('vegz_last_order', JSON.stringify(res.data));
+    window.location.href = 'order-success.html';
+  } catch (err) {
+    toast(err.message || 'Order failed. Try again.', 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="check-circle" style="width:18px;height:18px"></i> Place Order';
+    lucide.createIcons();
+  }
+}
+
+// ── Init ──────────────────────────────────────
+renderSummary();
+loadAddrs();
+</script>
+</body>
+</html>

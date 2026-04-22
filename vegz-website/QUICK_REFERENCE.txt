@@ -1,0 +1,63 @@
+╔═══════════════════════════════════════════════════════════════╗
+║           VEGZ PRIVATE LIMITED — QUICK REFERENCE CARD         ║
+║           Keep this handy. Do not share publicly.             ║
+╠═══════════════════════════════════════════════════════════════╣
+║                                                               ║
+║  🔐 ADMIN DASHBOARD                                           ║
+║     URL:      admin.vegz.online                               ║
+║     Email:    admin@vegz.online                               ║
+║     Password: Vegz@Admin2025                                  ║
+║                                                               ║
+║  🚚 AGENT APP                                                  ║
+║     URL:      agent.vegz.online                               ║
+║     Mobile:   [Your mobile number - 10 digits]               ║
+║     Password: Agent@123                                       ║
+║                                                               ║
+║  🌿 CUSTOMER SITE     vegz.online                             ║
+║  🌾 FARMER PORTAL     farmer.vegz.online                      ║
+║  ⚡ API               api.vegz.online/health                   ║
+║                                                               ║
+╠═══════════════════════════════════════════════════════════════╣
+║  DATABASE (MySQL)                                             ║
+║     Host: localhost (local) / Server2 IP (EC2)               ║
+║     User: vegz_user                                           ║
+║     Pass: vegz123                                             ║
+║     DB:   vegz_db                                             ║
+║     Connect: mysql -u vegz_user -pvegz123 vegz_db            ║
+║                                                               ║
+╠═══════════════════════════════════════════════════════════════╣
+║  SSH TO SERVERS                                               ║
+║     Server 1: ssh -i vegz-key.pem ubuntu@SERVER1_IP          ║
+║     Server 2: ssh -i vegz-key.pem ubuntu@SERVER2_IP          ║
+║                                                               ║
+╠═══════════════════════════════════════════════════════════════╣
+║  COMMON COMMANDS (run on Server 1)                            ║
+║                                                               ║
+║  pm2 status              → check if backend is running       ║
+║  pm2 restart vegz-api    → restart backend                   ║
+║  pm2 logs vegz-api       → view backend logs                 ║
+║  pm2 logs vegz-api --lines 50  → last 50 log lines           ║
+║                                                               ║
+║  sudo nginx -t           → test nginx config                  ║
+║  sudo systemctl reload nginx → apply nginx changes           ║
+║  sudo tail -50 /var/log/nginx/error.log → nginx errors       ║
+║                                                               ║
+║  df -h                   → check disk space                   ║
+║  free -h                 → check RAM                          ║
+║  curl https://api.vegz.online/health  → API health check     ║
+║                                                               ║
+╠═══════════════════════════════════════════════════════════════╣
+║  DEPLOY CODE CHANGES                                          ║
+║                                                               ║
+║  # Upload frontend:                                           ║
+║  scp -i vegz-key.pem -r frontend/ ubuntu@SERVER1:/var/www/vegz/  ║
+║                                                               ║
+║  # Upload backend and restart:                                ║
+║  scp -i vegz-key.pem backend/src/routes/*.js ubuntu@SERVER1:/var/www/vegz/backend/src/routes/  ║
+║  pm2 restart vegz-api                                         ║
+║                                                               ║
+╠═══════════════════════════════════════════════════════════════╣
+║  DEV OTP: 123456  (only when OTP_DEV_MODE=true)              ║
+║                                                               ║
+║  IMPORTANT: Set OTP_DEV_MODE=false before going live!        ║
+╚═══════════════════════════════════════════════════════════════╝

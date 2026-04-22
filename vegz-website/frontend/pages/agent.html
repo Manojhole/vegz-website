@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Vegz Agent App</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#15803d">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#16a34a;--g2:#22c55e;--g3:#4ade80;--g4:#dcfce7;--g5:#f0fdf4;
+  --a:#d97706;--a2:#fef3c7;--r:#dc2626;--r2:#fee2e2;--b:#2563eb;--b2:#dbeafe;
+  --ink:#0f172a;--ink2:#1e293b;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--white:#fff;
+  --serif:'Instrument Serif',serif;--sans:'Plus Jakarta Sans',sans-serif;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;display:flex;flex-direction:column}
+button{cursor:pointer;font-family:var(--sans);border:none}
+input{font-family:var(--sans)}
+
+/* ── LOGIN ── */
+.login-wrap{flex:1;display:flex;align-items:center;justify-content:center;background:var(--ink2);padding:16px;min-height:100vh}
+.login-card{background:var(--white);border-radius:24px;padding:40px 32px;width:100%;max-width:380px;box-shadow:0 32px 80px rgba(0,0,0,.25)}
+.lc-logo{font-family:var(--serif);font-size:26px;color:var(--g);margin-bottom:6px}
+.lc-badge{display:inline-block;background:var(--b2);color:var(--b);font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;margin-bottom:24px}
+.lc-title{font-family:var(--serif);font-size:24px;margin-bottom:6px}
+.lc-sub{font-size:14px;color:var(--muted);margin-bottom:24px}
+.lf{margin-bottom:14px}
+.lf label{display:block;font-size:13px;font-weight:600;color:var(--ink2);margin-bottom:6px}
+.lf input{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;outline:none;transition:.2s}
+.lf input:focus{border-color:var(--g)}
+.lc-err{font-size:13px;color:var(--r);min-height:18px;margin-bottom:10px}
+.btn-login{width:100%;background:var(--g);color:#fff;padding:14px;border-radius:10px;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s;cursor:pointer}
+.btn-login:hover{background:#15803d}
+
+/* ── APP LAYOUT ── */
+.app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.app-header{background:var(--white);border-bottom:1px solid var(--border);padding:0 16px;height:56px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.ah-logo{font-family:var(--serif);font-size:18px;color:var(--g)}
+.ah-name{font-size:14px;font-weight:700;color:var(--ink2);flex:1}
+.avail-toggle{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700}
+.toggle-pill{width:44px;height:24px;border-radius:999px;background:var(--border);position:relative;cursor:pointer;transition:.3s}
+.toggle-pill.on{background:var(--g)}
+.toggle-pill::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.3s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle-pill.on::after{left:22px}
+.ah-notif{font-size:20px;cursor:pointer;position:relative}
+.notif-count{position:absolute;top:-4px;right:-4px;background:var(--r);color:#fff;width:16px;height:16px;border-radius:50%;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;display:none}
+
+/* ── TABS ── */
+.tabs{display:flex;background:var(--white);border-bottom:1px solid var(--border);flex-shrink:0}
+.tab{flex:1;padding:12px 4px;text-align:center;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:.2s}
+.tab.active{color:var(--g);border-bottom-color:var(--g)}
+.tab-icon{font-size:18px;display:block;margin-bottom:2px}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto}
+.view{display:none;padding:16px}
+.view.active{display:block}
+
+/* ── STAT CARDS ── */
+.stat-row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.scard{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center}
+.scard-n{font-family:var(--serif);font-size:28px;color:var(--g);line-height:1}
+.scard-l{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+
+/* ── ASSIGNMENT CARDS ── */
+.acard{background:var(--white);border:1px solid var(--border);border-radius:16px;margin-bottom:12px;overflow:hidden}
+.acard.urgent{border-color:var(--r);border-width:2px}
+.acard.pickup{border-color:var(--a);border-width:2px}
+.ac-header{padding:14px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bg)}
+.ac-type-badge{padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700}
+.act-delivery{background:var(--b2);color:var(--b)}
+.act-pickup{background:var(--a2);color:var(--a)}
+.ac-num{font-weight:700;color:var(--ink2);font-size:14px;flex:1}
+.ac-status{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px}
+.acs-assigned {background:#eff6ff;color:var(--b)}
+.acs-accepted {background:var(--a2);color:var(--a)}
+.acs-en_route {background:#faf5ff;color:#7c3aed}
+.acs-arrived  {background:var(--a2);color:var(--a)}
+.acs-picked   {background:var(--g4);color:var(--g)}
+.acs-delivered{background:var(--g4);color:var(--g)}
+.ac-body{padding:14px 16px}
+.ac-dest{display:flex;align-items:flex-start;gap:8px;margin-bottom:10px}
+.ac-pin{font-size:18px;flex-shrink:0;margin-top:2px}
+.ac-addr{font-size:13px;color:var(--ink2);line-height:1.5}
+.ac-addr strong{display:block;font-weight:700;color:var(--ink)}
+.ac-meta{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.ac-m{font-size:12px;color:var(--muted)}
+.ac-m strong{color:var(--ink2)}
+.ac-earn{background:var(--g5);border:1px solid var(--g3);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--g);font-weight:700;margin-bottom:12px;text-align:center}
+.ac-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn-action{padding:10px 16px;border-radius:10px;font-size:13px;font-weight:700;flex:1;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:.2s;border:none}
+.btn-navigate{background:var(--b2);color:var(--b)}
+.btn-navigate:hover{background:var(--b);color:#fff}
+.btn-call{background:var(--g4);color:var(--g)}
+.btn-call:hover{background:var(--g);color:#fff}
+.btn-pickup{background:var(--a2);color:var(--a);width:100%;margin-top:6px}
+.btn-pickup:hover{background:var(--a);color:#fff}
+.btn-deliver{background:var(--g);color:#fff;width:100%;margin-top:6px}
+.btn-deliver:hover{background:#15803d}
+.btn-accept{background:var(--g);color:#fff;width:100%;margin-top:6px}
+.btn-accept:hover{background:#15803d}
+
+/* ── MAP VIEW ── */
+#map-container{height:calc(100vh - 200px);border-radius:12px;overflow:hidden;margin-bottom:12px}
+
+/* ── EARNINGS ── */
+.period-tabs{display:flex;gap:6px;margin-bottom:16px}
+.ptab{padding:7px 16px;border-radius:999px;font-size:12px;font-weight:700;border:1.5px solid var(--border);color:var(--muted);cursor:pointer;background:var(--white)}
+.ptab.active{border-color:var(--g);background:var(--g5);color:var(--g)}
+.earn-summary{background:linear-gradient(135deg,var(--g),#15803d);border-radius:16px;padding:24px;margin-bottom:16px;color:#fff}
+.es-amt{font-family:var(--serif);font-size:40px;color:#fff;margin-bottom:4px}
+.es-label{font-size:13px;color:rgba(255,255,255,.7)}
+.earn-list{display:flex;flex-direction:column;gap:8px}
+.earn-item{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px}
+.ei-icon{width:40px;height:40px;border-radius:50%;background:var(--g5);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ei-info{flex:1}
+.ei-name{font-size:14px;font-weight:700;color:var(--ink2)}
+.ei-detail{font-size:12px;color:var(--muted)}
+.ei-amt{font-size:16px;font-weight:800;color:var(--g)}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:48px 24px;color:var(--muted)}
+.empty-icon{font-size:48px;margin-bottom:14px}
+.empty p{font-size:15px}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:flex-end;opacity:0;visibility:hidden;transition:.3s}
+.overlay.open{opacity:1;visibility:visible}
+.sheet{background:var(--white);border-radius:24px 24px 0 0;padding:28px;width:100%;transform:translateY(100%);transition:transform .3s}
+.overlay.open .sheet{transform:translateY(0)}
+.sheet-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px}
+.sheet-title{font-family:var(--serif);font-size:20px;margin-bottom:16px}
+
+/* ── DELIVER CONFIRMATION ── */
+.confirm-box{background:var(--bg);border-radius:12px;padding:16px;margin-bottom:14px}
+.cb-row{display:flex;justify-content:space-between;font-size:14px;padding:4px 0}
+.cb-label{color:var(--muted)}
+.cb-val{font-weight:700;color:var(--ink2)}
+.payment-confirm{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.pay-opt{display:flex;align-items:center;gap:10px;padding:12px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer}
+.pay-opt.sel{border-color:var(--g);background:var(--g5)}
+.pay-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.pay-opt.sel .pay-radio{border-color:var(--g)}
+.pay-radio-dot{width:8px;height:8px;border-radius:50%;background:var(--g);display:none}
+.pay-opt.sel .pay-radio-dot{display:block}
+
+/* ── SPIN ── */
+.spin{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:rot .7s linear infinite;display:inline-block}
+@keyframes rot{to{transform:rotate(360deg)}}
+.hidden{display:none!important}
+
+/* ── TOAST ── */
+.toast-wrap{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:999;display:flex;flex-direction:column;gap:8px;width:90%;max-width:360px}
+.toast{padding:12px 20px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.15);animation:sup .3s ease;text-align:center}
+.toast.success{background:var(--g);color:#fff}
+.toast.error{background:var(--r);color:#fff}
+.toast.info{background:var(--ink2);color:#fff}
+@keyframes sup{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN PAGE ══ -->
+<div id="login-page" class="login-wrap">
+  <div class="login-card">
+    <div class="lc-logo">🌿 VEGZ</div>
+    <div class="lc-badge">🚚 Agent App</div>
+    <h2 class="lc-title">Agent Login</h2>
+    <p class="lc-sub">Login with your mobile number and password given by Vegz admin.</p>
+    <div class="lf">
+      <label>Mobile Number</label>
+      <input type="tel" id="a-mobile" placeholder="9876543210" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')" onkeypress="if(event.key==='Enter')agentLogin()">
+    </div>
+    <div class="lf">
+      <label>Password</label>
+      <input type="password" id="a-pass" placeholder="Password given by admin" onkeypress="if(event.key==='Enter')agentLogin()">
+    </div>
+    <div class="lc-err" id="a-err"></div>
+    <button class="btn-login" id="btn-al" onclick="agentLogin()"><span>Login</span><span>→</span></button>
+    <p style="font-size:12px;color:var(--muted);margin-top:14px;text-align:center">Default password: <strong>Agent@123</strong><br>Contact admin to change.</p>
+  </div>
+</div>
+
+<!-- ══ AGENT APP ══ -->
+<div class="app" id="agent-app" style="display:none">
+
+  <!-- HEADER -->
+  <div class="app-header">
+    <div class="ah-logo">🌿</div>
+    <div class="ah-name" id="ah-name">Agent</div>
+    <div class="avail-toggle">
+      <div class="toggle-pill on" id="avail-toggle" onclick="toggleAvailability()"></div>
+      <span id="avail-label" style="color:var(--g)">Online</span>
+    </div>
+    <div class="ah-notif" onclick="loadAssignments()">
+      🔔<div class="notif-count" id="notif-count">0</div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('home')"><span class="tab-icon">🏠</span>Home</div>
+    <div class="tab" onclick="switchTab('orders')"><span class="tab-icon">📦</span>My Jobs</div>
+    <div class="tab" onclick="switchTab('map')"><span class="tab-icon">🗺️</span>Map</div>
+    <div class="tab" onclick="switchTab('earnings')"><span class="tab-icon">💰</span>Earnings</div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- HOME -->
+    <div class="view active" id="view-home">
+      <div class="stat-row">
+        <div class="scard"><div class="scard-n" id="h-deliveries">0</div><div class="scard-l">Today's Deliveries</div></div>
+        <div class="scard"><div class="scard-n" id="h-earnings">₹0</div><div class="scard-l">Today's Earnings</div></div>
+        <div class="scard"><div class="scard-n" id="h-pending">0</div><div class="scard-l">Pending Jobs</div></div>
+        <div class="scard"><div class="scard-n" id="h-total">0</div><div class="scard-l">Total Deliveries</div></div>
+      </div>
+
+      <!-- Active assignments quick view -->
+      <div style="margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+        <div style="font-family:var(--serif);font-size:18px;color:var(--ink)">Active Jobs</div>
+        <button onclick="loadAssignments()" style="font-size:12px;font-weight:700;color:var(--g);padding:4px 10px;border:1px solid var(--g4);border-radius:6px;background:var(--g5);cursor:pointer">↻ Refresh</button>
+      </div>
+      <div id="home-assignments"></div>
+    </div>
+
+    <!-- MY JOBS -->
+    <div class="view" id="view-orders">
+      <div style="font-family:var(--serif);font-size:20px;color:var(--ink);margin-bottom:16px">All My Jobs</div>
+      <div id="all-assignments"></div>
+    </div>
+
+    <!-- MAP VIEW -->
+    <div class="view" id="view-map">
+      <div style="font-family:var(--serif);font-size:18px;color:var(--ink);margin-bottom:10px">Live Location Map</div>
+      <div id="map-container"></div>
+      <div style="background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px;font-size:13px;color:var(--muted)">
+        📍 Your location is shared with Vegz admin in real-time so deliveries can be tracked. Toggle offline to stop sharing.
+      </div>
+    </div>
+
+    <!-- EARNINGS -->
+    <div class="view" id="view-earnings">
+      <div class="period-tabs">
+        <div class="ptab active" onclick="loadEarnings('today',this)">Today</div>
+        <div class="ptab" onclick="loadEarnings('week',this)">This Week</div>
+        <div class="ptab" onclick="loadEarnings('month',this)">This Month</div>
+      </div>
+      <div class="earn-summary">
+        <div class="es-amt" id="earn-total">₹0</div>
+        <div class="es-label"><span id="earn-count">0</span> deliveries completed</div>
+      </div>
+      <div id="earn-list"></div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /app -->
+
+<!-- DELIVER CONFIRMATION SHEET -->
+<div class="overlay" id="deliver-sheet" onclick="if(event.target.id==='deliver-sheet')closeSheet()">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="ds-title">Confirm Delivery</div>
+    <div class="confirm-box" id="ds-details"></div>
+    <div style="font-size:13px;font-weight:700;color:var(--ink2);margin-bottom:10px">Payment collection:</div>
+    <div class="payment-confirm" id="ds-payment"></div>
+    <button class="btn-deliver" id="btn-confirm-deliver" onclick="confirmDeliver()">
+      ✅ Confirm Delivery
+    </button>
+  </div>
+</div>
+
+<!-- PICKUP CONFIRMATION SHEET -->
+<div class="overlay" id="pickup-sheet" onclick="if(event.target.id==='pickup-sheet')closeSheet()">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Confirm Farmer Pickup</div>
+    <div style="font-size:14px;color:var(--muted);margin-bottom:16px">Confirm that you have collected vegetables from farmer and heading to hub.</div>
+    <div class="confirm-box" id="ps-details"></div>
+    <div style="font-size:13px;font-weight:700;color:var(--a);background:var(--a2);border-radius:8px;padding:10px;margin-bottom:14px">
+      ⚠️ Farmer payment will be released ONLY after you deliver to hub and admin verifies actual quantity.
+    </div>
+    <button class="btn-pickup" id="btn-confirm-pickup" onclick="confirmPickup()" style="margin-top:0">
+      ✅ Confirm Pickup from Farm
+    </button>
+  </div>
+</div>
+
+<div id="toasts" class="toast-wrap"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ═══════════════════════════════════════════════
+//  VEGZ AGENT APP JS
+// ═══════════════════════════════════════════════
+
+const API_BASE = (() => {
+  const h = window.location.hostname;
+  if (h.includes('vegz.online')) return 'https://api.vegz.online';
+  return 'http://localhost:5001';
+})();
+
+let agentToken    = localStorage.getItem('vegz_agent_token') || '';
+let agentUser     = JSON.parse(localStorage.getItem('vegz_agent_user') || 'null');
+let assignments   = [];
+let activeMap     = null;
+let agentMarker   = null;
+let locationTimer = null;
+let isAvailable   = true;
+let activeDeliverAssignId = null;
+let activePickupAssignId  = null;
+let selectedPayMode = 'cod';
+
+// ── API helper ──────────────────────────────────
+async function api(method, path, body=null) {
+  const opts = { method, headers:{'Content-Type':'application/json','Authorization':`Bearer ${agentToken}`}};
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(`${API_BASE}/api/v1${path}`, opts);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || `Error ${res.status}`);
+  return data;
+}
+
+// ── Login ────────────────────────────────────────
+async function agentLogin() {
+  const mob  = document.getElementById('a-mobile').value.trim();
+  const pass = document.getElementById('a-pass').value;
+  const err  = document.getElementById('a-err');
+  const btn  = document.getElementById('btn-al');
+  err.textContent = '';
+  if (!mob || !pass) { err.textContent = 'Enter mobile and password.'; return; }
+  btn.disabled=true; btn.innerHTML='<div class="spin"></div><span>Logging in…</span>';
+  try {
+    const res = await api('POST', '/agent/auth/login', { mobile:mob, password:pass });
+    agentToken = res.token;
+    agentUser  = res.agent;
+    localStorage.setItem('vegz_agent_token', agentToken);
+    localStorage.setItem('vegz_agent_user', JSON.stringify(agentUser));
+    showApp();
+  } catch(e) {
+    err.textContent = e.message;
+    btn.disabled=false; btn.innerHTML='<span>Login</span><span>→</span>';
+  }
+}
+
+function agentLogout() {
+  stopLocationTracking();
+  localStorage.removeItem('vegz_agent_token');
+  localStorage.removeItem('vegz_agent_user');
+  location.reload();
+}
+
+// ── Show App ────────────────────────────────────
+function showApp() {
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('agent-app').style.display  = 'flex';
+  document.getElementById('ah-name').textContent = agentUser?.name || 'Agent';
+  loadDashboard();
+  loadAssignments();
+  startLocationTracking();
+}
+
+// ── Tab switch ──────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const tabs = ['home','orders','map','earnings'];
+  document.querySelectorAll('.tab')[tabs.indexOf(tab)]?.classList.add('active');
+  document.getElementById(`view-${tab}`)?.classList.add('active');
+  if (tab==='map')      initMap();
+  if (tab==='earnings') loadEarnings('today', document.querySelector('.ptab'));
+  if (tab==='orders')   loadAllAssignments();
+}
+
+// ── Dashboard ────────────────────────────────────
+async function loadDashboard() {
+  try {
+    const res = await api('GET', '/agent/dashboard');
+    const d = res.data;
+    document.getElementById('h-deliveries').textContent = d.todayDeliveries;
+    document.getElementById('h-earnings').textContent   = '₹'+parseFloat(d.todayEarnings).toLocaleString('en-IN');
+    document.getElementById('h-pending').textContent    = d.pendingAssignments;
+    document.getElementById('h-total').textContent      = d.totalDeliveries;
+  } catch {}
+}
+
+// ── Load assignments ────────────────────────────
+async function loadAssignments() {
+  try {
+    const res = await api('GET', '/agent/assignments');
+    assignments = res.data || [];
+    const pending = assignments.filter(a => !['delivered','failed'].includes(a.status));
+    const nc = document.getElementById('notif-count');
+    if (pending.length > 0) { nc.style.display='flex'; nc.textContent=pending.length; }
+    else nc.style.display='none';
+    renderHomeAssignments(pending);
+  } catch {}
+}
+
+async function loadAllAssignments() {
+  try {
+    const res = await api('GET', '/agent/assignments?status=');
+    const all = res.data || [];
+    renderAllAssignments(all);
+  } catch {}
+}
+
+function renderHomeAssignments(list) {
+  const el = document.getElementById('home-assignments');
+  if (!list.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">✅</div><p>No active jobs right now.<br>Stay available to receive new assignments.</p></div>`;
+    return;
+  }
+  el.innerHTML = list.map(a => assignmentCard(a, true)).join('');
+}
+
+function renderAllAssignments(list) {
+  const el = document.getElementById('all-assignments');
+  if (!list.length) { el.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><p>No assignments yet.</p></div>`; return; }
+  el.innerHTML = list.map(a => assignmentCard(a, false)).join('');
+}
+
+function assignmentCard(a, compact) {
+  const isDelivery = a.type === 'delivery' || a.type === 'both';
+  const isPickup   = a.type === 'pickup'   || a.type === 'both';
+  const isDelivered= a.status === 'delivered';
+
+  return `<div class="acard ${a.status==='assigned'?'urgent':''} ${isPickup&&a.type==='pickup'?'pickup':''}">
+    <div class="ac-header">
+      <span class="ac-type-badge ${isPickup&&a.type==='pickup'?'act-pickup':'act-delivery'}">${isPickup&&a.type==='pickup'?'🌾 Pickup':'🚚 Delivery'}</span>
+      <div class="ac-num">${a.order_number||a.farmer_listing_num||'Job #'+a.id}</div>
+      <span class="ac-status acs-${a.status}">${fmtStatus(a.status)}</span>
+    </div>
+    <div class="ac-body">
+      ${isDelivery && a.address_line1 ? `
+      <div class="ac-dest">
+        <div class="ac-pin">📍</div>
+        <div class="ac-addr"><strong>${a.customer_name||'Customer'}</strong>${a.address_line1}, ${a.city||''}</div>
+      </div>` : ''}
+      ${isPickup && a.farmer_name ? `
+      <div class="ac-dest">
+        <div class="ac-pin">🌾</div>
+        <div class="ac-addr"><strong>${a.farmer_name}</strong>${a.village||''} · ${a.pickup_time||''}</div>
+      </div>` : ''}
+      <div class="ac-meta">
+        ${a.delivery_time?`<div class="ac-m">🕐 <strong>${a.delivery_time}</strong></div>`:''}
+        ${a.total_amount?`<div class="ac-m">💰 <strong>₹${Number(a.total_amount).toLocaleString('en-IN')}</strong> (${(a.payment_method||'').toUpperCase()})</div>`:''}
+        ${a.contact_phone?`<div class="ac-m">📞 <strong>${a.contact_phone}</strong></div>`:''}
+        ${a.farmer_mobile?`<div class="ac-m">📞 <strong>${a.farmer_mobile}</strong></div>`:''}
+      </div>
+      <div class="ac-earn">💵 You earn: ₹${parseFloat(a.earning_amount||25).toLocaleString('en-IN')} for this job</div>
+      ${isDelivered ? `<div style="background:var(--g5);border:1px solid var(--g3);border-radius:8px;padding:10px;font-size:13px;color:var(--g);font-weight:700;text-align:center">✅ Delivered — Earning credited</div>` : `
+      <div class="ac-actions">
+        ${a.location_lat?`<button class="btn-action btn-navigate" onclick="navigateTo(${a.location_lat},${a.location_lng})">🗺️ Navigate</button>`:''}
+        ${a.farm_lat?`<button class="btn-action btn-navigate" onclick="navigateTo(${a.farm_lat},${a.farm_lng})">🗺️ Farm Map</button>`:''}
+        ${a.contact_phone?`<button class="btn-action btn-call" onclick="window.open('tel:${a.contact_phone}')">📞 Call</button>`:''}
+        ${a.farmer_mobile?`<button class="btn-action btn-call" onclick="window.open('tel:${a.farmer_mobile}')">📞 Call Farmer</button>`:''}
+      </div>
+      ${a.status==='assigned'?`<button class="btn-accept" onclick="updateStatus(${a.id},'accepted')">✓ Accept Job</button>`:''}
+      ${a.status==='accepted'?`<button class="btn-action btn-navigate" style="width:100%;margin-top:6px" onclick="updateStatus(${a.id},'en_route')">🚗 Start Journey</button>`:''}
+      ${a.status==='en_route' && isPickup?`<button class="btn-pickup" onclick="openPickupSheet(${a.id})">📦 Confirm Pickup from Farm</button>`:''}
+      ${a.status==='en_route' && isDelivery?`<button class="btn-deliver" onclick="openDeliverSheet(${a.id},${JSON.stringify(a).replace(/"/g,'&quot;')})">✅ Confirm Delivery</button>`:''}
+      ${a.status==='picked'?`<button class="btn-deliver" onclick="openDeliverSheet(${a.id},${JSON.stringify(a).replace(/"/g,'&quot;')})">✅ Mark Delivered to Customer</button>`:''}
+      `}
+    </div>
+  </div>`;
+}
+
+// ── Status update ────────────────────────────────
+async function updateStatus(assignId, status, notes='') {
+  try {
+    await api('PATCH', `/agent/assignments/${assignId}/status`, { status, notes });
+    toast(`Status: ${fmtStatus(status)}`, 'success');
+    loadAssignments();
+    loadDashboard();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+// ── Delivery sheet ───────────────────────────────
+function openDeliverSheet(id, assignment) {
+  activeDeliverAssignId = id;
+  const a = typeof assignment === 'string' ? JSON.parse(assignment.replace(/&quot;/g,'"')) : assignment;
+  document.getElementById('ds-title').textContent = `Deliver to ${a.customer_name||'Customer'}`;
+  document.getElementById('ds-details').innerHTML = `
+    <div class="cb-row"><span class="cb-label">Order</span><span class="cb-val">${a.order_number||'—'}</span></div>
+    <div class="cb-row"><span class="cb-label">Address</span><span class="cb-val">${a.address_line1||''}, ${a.city||''}</span></div>
+    <div class="cb-row"><span class="cb-label">Amount</span><span class="cb-val">₹${Number(a.total_amount||0).toLocaleString('en-IN')}</span></div>
+    <div class="cb-row"><span class="cb-label">Your Earning</span><span class="cb-val" style="color:var(--g)">₹${parseFloat(a.earning_amount||25)}</span></div>`;
+  const payMethod = a.payment_method || 'cod';
+  if (payMethod === 'cod') {
+    document.getElementById('ds-payment').innerHTML = `
+      <div class="pay-opt sel"><div class="pay-radio"><div class="pay-radio-dot"></div></div><div><div style="font-weight:700">Cash on Delivery</div><div style="font-size:12px;color:var(--muted)">Collect ₹${Number(a.total_amount||0).toLocaleString('en-IN')} cash from customer</div></div></div>`;
+  } else {
+    document.getElementById('ds-payment').innerHTML = `
+      <div class="pay-opt sel"><div class="pay-radio"><div class="pay-radio-dot"></div></div><div><div style="font-weight:700">UPI / Online</div><div style="font-size:12px;color:var(--muted)">Payment already done online — verify with customer</div></div></div>`;
+  }
+  document.getElementById('deliver-sheet').classList.add('open');
+}
+
+async function confirmDeliver() {
+  if (!activeDeliverAssignId) return;
+  const btn = document.getElementById('btn-confirm-deliver');
+  btn.disabled=true; btn.innerHTML='<div class="spin"></div> Confirming…';
+  try {
+    await api('PATCH', `/agent/assignments/${activeDeliverAssignId}/status`, { status:'delivered' });
+    closeSheet();
+    toast('Delivery confirmed! ₹ credited to your account ✅','success');
+    loadAssignments();
+    loadDashboard();
+  } catch(e) { toast(e.message,'error'); }
+  btn.disabled=false; btn.innerHTML='✅ Confirm Delivery';
+}
+
+// ── Pickup sheet ─────────────────────────────────
+function openPickupSheet(id) {
+  activePickupAssignId = id;
+  const a = assignments.find(x => x.id === id);
+  if (!a) return;
+  document.getElementById('ps-details').innerHTML = `
+    <div class="cb-row"><span class="cb-label">Farmer</span><span class="cb-val">${a.farmer_name||'—'}</span></div>
+    <div class="cb-row"><span class="cb-label">Location</span><span class="cb-val">${a.village||'—'}</span></div>
+    <div class="cb-row"><span class="cb-label">Phone</span><span class="cb-val">${a.farmer_mobile||'—'}</span></div>
+    <div class="cb-row"><span class="cb-label">Your Earning</span><span class="cb-val" style="color:var(--g)">₹${parseFloat(a.earning_amount||50)}</span></div>`;
+  document.getElementById('pickup-sheet').classList.add('open');
+}
+
+async function confirmPickup() {
+  if (!activePickupAssignId) return;
+  const btn = document.getElementById('btn-confirm-pickup');
+  btn.disabled=true; btn.innerHTML='<div class="spin"></div> Confirming…';
+  try {
+    await api('PATCH', `/agent/assignments/${activePickupAssignId}/status`, { status:'picked', notes:'Picked from farm, heading to hub' });
+    closeSheet();
+    toast('Pickup confirmed! Head to hub.','success');
+    loadAssignments();
+  } catch(e) { toast(e.message,'error'); }
+  btn.disabled=false; btn.innerHTML='✅ Confirm Pickup from Farm';
+}
+
+function closeSheet() {
+  document.querySelectorAll('.overlay').forEach(o => o.classList.remove('open'));
+}
+
+// ── Navigate via OSM/Google Maps ─────────────────
+function navigateTo(lat, lng) {
+  // Opens Google Maps navigation on phone
+  const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
+  window.open(url, '_blank');
+}
+
+// ── Map ──────────────────────────────────────────
+function initMap() {
+  if (activeMap) { setTimeout(()=>activeMap.invalidateSize(),200); return; }
+  activeMap = L.map('map-container').setView([15.2083, 75.9305], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'© OpenStreetMap',maxZoom:19
+  }).addTo(activeMap);
+
+  // Show assignment markers
+  assignments.forEach(a => {
+    if (a.location_lat) {
+      L.marker([a.location_lat, a.location_lng])
+        .addTo(activeMap)
+        .bindPopup(`📦 ${a.order_number||''}<br>${a.customer_name||''}<br>${a.city||''}`);
+    }
+    if (a.farm_lat) {
+      L.marker([a.farm_lat, a.farm_lng], {
+        icon: L.divIcon({className:'',html:'<div style="font-size:24px">🌾</div>'})
+      }).addTo(activeMap)
+        .bindPopup(`🌾 ${a.farmer_name||''}<br>${a.village||''}`);
+    }
+  });
+
+  // Agent's current location
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(pos => {
+      const { latitude:lat, longitude:lng } = pos.coords;
+      agentMarker = L.marker([lat,lng], {
+        icon: L.divIcon({className:'',html:'<div style="font-size:28px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3))">🏍️</div>'})
+      }).addTo(activeMap).bindPopup('📍 You are here').openPopup();
+      activeMap.setView([lat,lng], 14);
+    });
+  }
+}
+
+// ── Location tracking ─────────────────────────────
+function startLocationTracking() {
+  if (!navigator.geolocation) return;
+  locationTimer = setInterval(() => {
+    if (!isAvailable) return;
+    navigator.geolocation.getCurrentPosition(pos => {
+      const lat = pos.coords.latitude.toFixed(6);
+      const lng = pos.coords.longitude.toFixed(6);
+      api('POST', '/agent/location', { lat, lng }).catch(()=>{});
+      // Update map marker if visible
+      if (agentMarker) agentMarker.setLatLng([lat, lng]);
+    });
+  }, 30000); // every 30 seconds
+}
+
+function stopLocationTracking() { clearInterval(locationTimer); }
+
+// ── Availability toggle ──────────────────────────
+async function toggleAvailability() {
+  isAvailable = !isAvailable;
+  const pill  = document.getElementById('avail-toggle');
+  const label = document.getElementById('avail-label');
+  pill.classList.toggle('on', isAvailable);
+  label.textContent = isAvailable ? 'Online' : 'Offline';
+  label.style.color = isAvailable ? 'var(--g)' : 'var(--r)';
+  try { await api('PATCH', '/agent/availability', { isAvailable }); } catch {}
+  if (!isAvailable) stopLocationTracking();
+  else startLocationTracking();
+  toast(isAvailable ? 'You are now online 🟢' : 'You are offline 🔴', isAvailable?'success':'info');
+}
+
+// ── Earnings ─────────────────────────────────────
+async function loadEarnings(period, btn) {
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
+  btn?.classList.add('active');
+  try {
+    const res = await api('GET', `/agent/earnings?period=${period}`);
+    const { deliveries, total, count } = res.data;
+    document.getElementById('earn-total').textContent = '₹'+parseFloat(total).toLocaleString('en-IN');
+    document.getElementById('earn-count').textContent = count;
+    const el = document.getElementById('earn-list');
+    if (!deliveries.length) { el.innerHTML='<div class="empty"><div class="empty-icon">💰</div><p>No earnings yet for this period.</p></div>'; return; }
+    el.innerHTML = deliveries.map(d=>`
+      <div class="earn-item">
+        <div class="ei-icon">🚚</div>
+        <div class="ei-info">
+          <div class="ei-name">${d.order_number||'Delivery'}</div>
+          <div class="ei-detail">${d.city||'—'} · ${fmtTime(d.delivered_at)}</div>
+        </div>
+        <div class="ei-amt">₹${parseFloat(d.earning_amount).toLocaleString('en-IN')}</div>
+      </div>`).join('');
+  } catch(e) { toast(e.message,'error'); }
+}
+
+// ── Helpers ──────────────────────────────────────
+function fmtStatus(s){const m={assigned:'Assigned',accepted:'Accepted',en_route:'En Route',arrived:'Arrived',picked:'Picked Up',delivered:'Delivered ✓',failed:'Failed'};return m[s]||s;}
+function fmtTime(ts){if(!ts)return'—';const d=new Date(ts);return d.toLocaleDateString('en-IN',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});}
+
+function toast(msg,type='info'){
+  let w=document.getElementById('toasts');
+  const t=document.createElement('div');t.className=`toast ${type}`;t.textContent=msg;w.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(8px)';t.style.transition='.3s';setTimeout(()=>t.remove(),300);},4000);
+}
+
+// ── Init ─────────────────────────────────────────
+if (agentToken && agentUser) showApp();
+setInterval(() => { if(agentToken && agentUser) loadAssignments(); }, 60000); // poll every 60s
+</script>
+</body>
+</html>

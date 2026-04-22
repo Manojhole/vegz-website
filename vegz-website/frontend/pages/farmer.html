@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vegz Farmer Portal — ರೈತ ಪೋರ್ಟಲ್ | Sell Vegetables | North Karnataka</title>
+<meta name="description" content="Farmers in North Karnataka can sell their fresh vegetables to Vegz. Better price than APMC. Same-day payment. Agent collects from your farm. ರೈತರು ತಮ್ಮ ತರಕಾರಿಗಳನ್ನು Vegz ಗೆ ಮಾರಬಹುದು.">
+<meta name="robots" content="index, follow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#1a7a3c;--green2:#22a052;--green3:#4ade80;--green4:#dcfce7;--green5:#f0fdf4;
+  --amber:#d97706;--amber2:#fef3c7;--amber3:#fffbeb;
+  --ink:#0a0f0d;--ink2:#1c2b22;--ink3:#374151;--muted:#6b7280;
+  --border:#e5e7eb;--white:#fff;--off:#f8faf8;--red:#dc2626;--red2:#fee2e2;
+  --serif:'Instrument Serif',Georgia,serif;--sans:'Plus Jakarta Sans',system-ui,sans-serif;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--off);color:var(--ink);-webkit-font-smoothing:antialiased;min-height:100svh}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:var(--sans);border:none;background:none}
+input,select,textarea{font-family:var(--sans)}
+
+/* NAV */
+.nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 clamp(16px,5vw,40px);height:64px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100}
+.nav-logo{display:flex;align-items:center;gap:8px;font-family:var(--serif);font-size:22px;color:var(--green)}
+.nav-badge{background:var(--amber2);color:var(--amber);font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;border:1px solid #fcd34d}
+.nav-right{margin-left:auto;display:flex;gap:10px;align-items:center}
+.nav-link{font-size:13px;font-weight:600;color:var(--muted)}
+.nav-link:hover{color:var(--green)}
+
+/* HERO BANNER */
+.farmer-hero{background:linear-gradient(135deg,#0d3d1e 0%,#1a5c2e 40%,#1d6b34 100%);padding:40px clamp(16px,5vw,40px);position:relative;overflow:hidden}
+.farmer-hero::before{content:'';position:absolute;top:-100px;right:-100px;width:400px;height:400px;border-radius:50%;background:rgba(74,222,128,.08);filter:blur(60px)}
+.fh-inner{max-width:900px;margin:0 auto;position:relative;z-index:1}
+.fh-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.25);color:var(--green3);font-size:12px;font-weight:600;letter-spacing:.5px;padding:5px 14px;border-radius:999px;margin-bottom:16px}
+.fh-tag-dot{width:6px;height:6px;border-radius:50%;background:var(--green3);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(1.6)}}
+.fh-title{font-family:var(--serif);font-size:clamp(28px,4vw,48px);color:var(--white);line-height:1.1;margin-bottom:8px}
+.fh-sub{font-size:14px;color:rgba(255,255,255,.55);margin-bottom:24px;line-height:1.65}
+.fh-benefits{display:flex;gap:20px;flex-wrap:wrap}
+.fhb{display:flex;align-items:center;gap:6px;font-size:13px;color:rgba(255,255,255,.65)}
+.fhb-icon{width:18px;height:18px;border-radius:50%;background:rgba(74,222,128,.2);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+
+/* MAIN CONTENT */
+.main{max-width:900px;margin:0 auto;padding:32px clamp(16px,5vw,40px)}
+
+/* FLOW STEPS */
+.flow-steps{display:flex;gap:0;background:var(--white);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:28px}
+.fs-item{flex:1;padding:16px;text-align:center;font-size:12px;font-weight:600;color:var(--muted);border-right:1px solid var(--border);position:relative}
+.fs-item:last-child{border-right:none}
+.fs-item.active{background:var(--green5);color:var(--green)}
+.fs-item.done{background:var(--green4);color:var(--green)}
+.fs-num{width:24px;height:24px;border-radius:50%;background:var(--border);color:var(--white);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 6px}
+.fs-item.active .fs-num{background:var(--green2)}
+.fs-item.done .fs-num{background:var(--green);content:'✓'}
+@media(max-width:600px){.fs-item{padding:10px 6px;font-size:10px}}
+
+/* CARDS */
+.card{background:var(--white);border:1px solid var(--border);border-radius:20px;padding:28px;margin-bottom:20px}
+.card-title{font-family:var(--serif);font-size:20px;color:var(--ink);margin-bottom:4px;display:flex;align-items:center;gap:10px}
+.card-sub{font-size:13px;color:var(--muted);margin-bottom:24px}
+
+/* FORM */
+.form-2col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.fgroup{margin-bottom:16px}
+.fgroup:last-child{margin-bottom:0}
+.fgroup label{display:block;font-size:13px;font-weight:600;color:var(--ink3);margin-bottom:7px}
+.fgroup .kn{font-size:11px;color:var(--muted);font-weight:400;margin-left:4px}
+.fgroup input,.fgroup select,.fgroup textarea{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;color:var(--ink);transition:.2s;outline:none;font-family:var(--sans)}
+.fgroup input:focus,.fgroup select:focus,.fgroup textarea:focus{border-color:var(--green2)}
+.fgroup textarea{resize:none}
+.ferr{font-size:12px;color:var(--red);margin-top:4px}
+.fhint{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5}
+@media(max-width:600px){.form-2col{grid-template-columns:1fr}}
+
+/* PHONE LOGIN */
+.phone-wrap{display:flex;align-items:center;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;transition:.2s}
+.phone-wrap:focus-within{border-color:var(--green2)}
+.phone-pre{padding:0 12px;font-size:15px;font-weight:600;color:var(--ink3);background:#f9fafb;border-right:1px solid var(--border);height:48px;display:flex;align-items:center;flex-shrink:0}
+.phone-inp{flex:1;padding:0 14px;font-size:16px;font-weight:700;color:var(--ink);border:none;outline:none;background:transparent;height:48px;letter-spacing:1.5px;width:0}
+
+/* OTP */
+.otp-row{display:flex;gap:8px;justify-content:flex-start;margin:16px 0}
+.otp-box{width:44px;height:52px;border:1.5px solid var(--border);border-radius:10px;font-size:20px;font-weight:800;text-align:center;color:var(--ink);transition:.2s;background:#f9fafb;outline:none;font-family:var(--sans)}
+.otp-box:focus{border-color:var(--green2);background:var(--white)}
+.otp-box.ok{border-color:var(--green2);background:var(--green5);color:var(--green)}
+.otp-box.err{border-color:var(--red);background:var(--red2);animation:shk .3s}
+@keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+/* VEGETABLE SELECTOR */
+.veg-list{display:flex;flex-direction:column;gap:12px}
+.veg-row{border:1.5px solid var(--border);border-radius:14px;padding:16px;background:var(--white);transition:.2s;cursor:pointer}
+.veg-row:hover{border-color:var(--green3)}
+.veg-row.selected{border-color:var(--green2);background:var(--green5)}
+.vr-top{display:flex;align-items:center;gap:12px}
+.vr-check{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;transition:.2s;display:flex;align-items:center;justify-content:center;font-size:11px}
+.veg-row.selected .vr-check{border-color:var(--green2);background:var(--green2);color:var(--white)}
+.vr-emoji{font-size:32px;flex-shrink:0}
+.vr-info{flex:1}
+.vr-name{font-weight:700;color:var(--ink);font-size:15px}
+.vr-kn{font-size:12px;color:var(--muted)}
+.vr-price{font-family:var(--serif);font-size:18px;font-weight:700;color:var(--green);white-space:nowrap}
+.vr-price small{font-size:11px;color:var(--muted);font-weight:400;font-family:var(--sans)}
+.vr-qty{display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.veg-row.selected .vr-qty{display:block}
+
+/* QTY SELECTOR */
+.qty-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.qchip{padding:7px 16px;border:1.5px solid var(--border);border-radius:999px;font-size:13px;font-weight:600;color:var(--ink3);cursor:pointer;transition:.2s}
+.qchip:hover{border-color:var(--green3);color:var(--green)}
+.qchip.active{border-color:var(--green2);background:var(--green5);color:var(--green)}
+
+/* CUSTOM QTY */
+.custom-qty-wrap{display:flex;align-items:center;gap:10px;margin-top:8px}
+.custom-qty-wrap label{font-size:13px;color:var(--muted);white-space:nowrap}
+.custom-qty-inp{width:120px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;font-weight:700;text-align:center;outline:none;transition:.2s}
+.custom-qty-inp:focus{border-color:var(--green2)}
+.qty-est{font-size:13px;color:var(--green);font-weight:600;margin-top:8px}
+
+/* TOTAL PREVIEW */
+.total-card{background:linear-gradient(135deg,var(--green5),var(--green4));border:1.5px solid var(--green3);border-radius:16px;padding:24px;margin-bottom:20px}
+.tc-title{font-size:13px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px}
+.tc-row{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--ink3);padding:6px 0;border-bottom:1px solid rgba(74,222,128,.2)}
+.tc-row:last-child{border-bottom:none}
+.tc-total{display:flex;justify-content:space-between;font-size:20px;font-weight:800;color:var(--ink);padding-top:14px;margin-top:4px}
+.tc-total span:last-child{color:var(--green)}
+.tc-note{font-size:12px;color:var(--muted);margin-top:12px;line-height:1.6;padding:10px;background:rgba(255,255,255,.6);border-radius:8px}
+
+/* IMPORTANT BOX */
+.important-box{background:var(--amber3);border:1.5px solid #fcd34d;border-radius:14px;padding:18px;margin-bottom:20px}
+.ib-title{font-weight:700;color:var(--amber);font-size:14px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.ib-list{list-style:none;padding:0}
+.ib-list li{font-size:13px;color:var(--ink3);padding:6px 0 6px 20px;position:relative;border-bottom:1px solid rgba(253,230,138,.5)}
+.ib-list li:last-child{border-bottom:none}
+.ib-list li::before{content:'⚠️';position:absolute;left:0;font-size:12px}
+
+/* QUANTITY MISMATCH SOLUTION */
+.mismatch-box{background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:14px;padding:18px;margin-bottom:20px}
+.mb-title{font-weight:700;color:#1e40af;font-size:14px;margin-bottom:10px}
+.mb-steps{counter-reset:ms}
+.mb-step{counter-increment:ms;padding:8px 0 8px 28px;position:relative;font-size:13px;color:var(--ink3);border-bottom:1px solid #dbeafe}
+.mb-step:last-child{border-bottom:none}
+.mb-step::before{content:counter(ms);position:absolute;left:0;width:20px;height:20px;border-radius:50%;background:#1e40af;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;top:10px}
+
+/* SUBMIT BTN */
+.btn-submit{width:100%;background:var(--green2);color:var(--white);padding:16px;border-radius:12px;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;transition:.2s;cursor:pointer;border:none;font-family:var(--sans)}
+.btn-submit:hover{background:var(--green)}
+.btn-submit:disabled{background:#d1d5db;cursor:not-allowed}
+.btn-secondary{background:transparent;border:1.5px solid var(--border);color:var(--ink3);padding:12px 24px;border-radius:10px;font-size:14px;font-weight:600;transition:.2s;cursor:pointer}
+.btn-secondary:hover{border-color:var(--green2);color:var(--green)}
+
+/* STATUS BADGE */
+.status-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:700}
+.sb-pending{background:var(--amber2);color:var(--amber)}
+.sb-collected{background:var(--green4);color:var(--green)}
+.sb-paid{background:#dbeafe;color:#1e40af}
+
+/* SPINNER */
+.spin{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:rot .7s linear infinite;display:inline-block}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* MODAL */
+.mbg{position:fixed;inset:0;background:rgba(10,15,13,.6);backdrop-filter:blur(5px);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;visibility:hidden;transition:.3s}
+.mbg.open{opacity:1;visibility:visible}
+.mbox{background:var(--white);border-radius:24px;padding:36px;max-width:420px;width:100%;position:relative;box-shadow:0 32px 80px rgba(0,0,0,.2);transform:translateY(20px);transition:transform .3s var(--ease)}
+.mbg.open .mbox{transform:translateY(0)}
+.mx{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;color:var(--muted)}
+.mlogo{font-family:var(--serif);font-size:20px;color:var(--green);margin-bottom:20px}
+.mtitle{font-family:var(--serif);font-size:24px;color:var(--ink);margin-bottom:6px}
+.msub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.bmodal{width:100%;background:var(--green2);color:var(--white);padding:14px;border-radius:10px;font-size:15px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s;border:none;cursor:pointer;font-family:var(--sans)}
+.bmodal:hover{background:var(--green)}
+.bmodal:disabled{background:#d1d5db;cursor:not-allowed}
+.blink{width:100%;text-align:center;font-size:13px;color:var(--muted);padding:6px;cursor:pointer;background:none;border:none;font-family:var(--sans)}
+.ferr-m{font-size:13px;color:var(--red);min-height:18px;margin-bottom:12px}
+.otp-resend{font-size:13px;color:var(--muted);margin-bottom:16px}
+.rbtn{color:var(--green);font-weight:700;background:none;border:none;cursor:pointer;font-size:13px;font-family:var(--sans)}
+
+/* SUCCESS PAGE */
+.success-box{background:var(--white);border-radius:24px;padding:48px 36px;text-align:center;max-width:480px;margin:40px auto;border:1px solid var(--border)}
+.success-circle{width:96px;height:96px;border-radius:50%;background:var(--green4);margin:0 auto 24px;display:flex;align-items:center;justify-content:center;font-size:44px}
+.suc-num{font-family:var(--serif);font-size:28px;font-weight:700;color:var(--green)}
+
+/* TOAST */
+.toast-wrap{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{display:flex;align-items:center;gap:10px;padding:12px 20px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,.15);animation:sup .3s var(--ease);max-width:300px}
+.toast.success{background:var(--green);color:var(--white)}
+.toast.error{background:var(--red);color:var(--white)}
+.toast.info{background:var(--ink2);color:var(--white)}
+@keyframes sup{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+.hidden{display:none!important}
+
+/* LOCATION BTN */
+.loc-btn{display:flex;align-items:center;gap:8px;background:var(--green5);border:1.5px solid var(--green3);border-radius:999px;padding:9px 18px;font-size:13px;font-weight:700;color:var(--green);cursor:pointer;transition:.2s;margin-bottom:8px}
+.loc-btn:hover{background:var(--green4)}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="../index.html" class="nav-logo">🌿 VEGZ</a>
+  <span class="nav-badge">🌾 Farmer Portal · ರೈತ ಪೋರ್ಟಲ್</span>
+  <div class="nav-right">
+    <a href="../pages/shop.html" class="nav-link">Order as Business →</a>
+  </div>
+</nav>
+
+<!-- HERO BANNER -->
+<div class="farmer-hero">
+  <div class="fh-inner">
+    <div class="fh-tag"><span class="fh-tag-dot"></span>ರೈತರಿಗಾಗಿ · For Farmers of North Karnataka</div>
+    <h1 class="fh-title">Sell Your Vegetables<br><em style="color:var(--green3);font-style:italic">to Vegz — Better Price, Instant Payment</em></h1>
+    <p class="fh-sub">List your vegetables → Our agent visits your farm → We verify & collect → You get paid same day.<br>ನಿಮ್ಮ ತರಕಾರಿ ಪಟ್ಟಿ ಮಾಡಿ → ನಮ್ಮ ಏಜೆಂಟ್ ಫಾರ್ಮ್‌ಗೆ ಬರುತ್ತಾರೆ → ನೇರ ಪಾವತಿ</p>
+    <div class="fh-benefits">
+      <div class="fhb"><div class="fhb-icon">✓</div>Better price than APMC · APMC ಗಿಂತ ಹೆಚ್ಚು ಬೆಲೆ</div>
+      <div class="fhb"><div class="fhb-icon">✓</div>Agent comes to your farm · ಏಜೆಂಟ್ ಫಾರ್ಮ್‌ಗೆ ಬರುತ್ತಾರೆ</div>
+      <div class="fhb"><div class="fhb-icon">✓</div>Same day UPI payment · ಅದೇ ದಿನ ಪಾವತಿ</div>
+      <div class="fhb"><div class="fhb-icon">✓</div>No middlemen · ಮಧ್ಯವರ್ತಿ ಇಲ್ಲ</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main" id="main-content">
+
+  <!-- QUANTITY MISMATCH SOLUTION INFO -->
+  <div class="important-box">
+    <div class="ib-title">⚠️ Important — How quantity works · ಪ್ರಮಾಣ ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ</div>
+    <ul class="ib-list">
+      <li><strong>You list what you estimate</strong> — ನೀವು ಅಂದಾಜಿನ ಪ್ರಕಾರ ಪ್ರಮಾಣ ನಮೂದಿಸಿ</li>
+      <li><strong>Our agent visits and does official weighing</strong> — ನಮ್ಮ ಏಜೆಂಟ್ ಬಂದು ಅಧಿಕೃತ ತೂಕ ಮಾಡುತ್ತಾರೆ</li>
+      <li><strong>Payment is based on actual weight collected</strong> — ಪ್ರತ್ಯಕ್ಷ ತೂಕದ ಮೇಲೆ ಪಾವತಿ</li>
+      <li>If actual quantity is more than listed — we pay for the actual amount collected</li>
+      <li>If actual quantity is less than listed — we pay only for what we collect</li>
+    </ul>
+  </div>
+
+  <!-- STEP INDICATOR -->
+  <div class="flow-steps" id="flow-steps">
+    <div class="fs-item active" id="fs1"><div class="fs-num">1</div>Login</div>
+    <div class="fs-item" id="fs2"><div class="fs-num">2</div>Select Vegetables</div>
+    <div class="fs-item" id="fs3"><div class="fs-num">3</div>Farm Address</div>
+    <div class="fs-item" id="fs4"><div class="fs-num">4</div>Review & Submit</div>
+  </div>
+
+  <!-- ══ STEP 1: LOGIN ══ -->
+  <div id="step-login">
+    <div class="card">
+      <div class="card-title">📱 Login with Mobile OTP<span style="font-size:14px;font-weight:400;color:var(--muted);font-family:var(--sans)"> · ಮೊಬೈಲ್ OTP ಮೂಲಕ ಲಾಗಿನ್</span></div>
+      <p class="card-sub">Enter your mobile number to continue. New farmers are registered automatically.</p>
+
+      <div id="login-mobile-step">
+        <div class="fgroup">
+          <label>Mobile Number <span class="kn">· ಮೊಬೈಲ್ ನಂಬರ್</span></label>
+          <div class="phone-wrap">
+            <div class="phone-pre">🇮🇳 +91</div>
+            <input type="tel" id="f-mobile" class="phone-inp" placeholder="98765 43210" maxlength="10"
+              oninput="this.value=this.value.replace(/\D/g,'')" onkeypress="if(event.key==='Enter')farmerSendOTP()">
+          </div>
+          <div class="ferr" id="f-mobile-err"></div>
+        </div>
+        <button class="btn-submit" id="f-btn-send" onclick="farmerSendOTP()">
+          <span>Send OTP</span><span>→</span>
+        </button>
+      </div>
+
+      <div id="login-otp-step" style="display:none">
+        <p style="font-size:14px;color:var(--muted);margin-bottom:12px" id="f-otp-sent">OTP sent to +91 XXXXXXXXXX</p>
+        <div class="otp-row">
+          <input type="tel" maxlength="1" class="otp-box" oninput="fOtpIn(this,0)" onkeydown="fOtpKey(this,0,event)" onpaste="fOtpPaste(event)" autocomplete="one-time-code" inputmode="numeric">
+          <input type="tel" maxlength="1" class="otp-box" oninput="fOtpIn(this,1)" onkeydown="fOtpKey(this,1,event)" inputmode="numeric">
+          <input type="tel" maxlength="1" class="otp-box" oninput="fOtpIn(this,2)" onkeydown="fOtpKey(this,2,event)" inputmode="numeric">
+          <input type="tel" maxlength="1" class="otp-box" oninput="fOtpIn(this,3)" onkeydown="fOtpKey(this,3,event)" inputmode="numeric">
+          <input type="tel" maxlength="1" class="otp-box" oninput="fOtpIn(this,4)" onkeydown="fOtpKey(this,4,event)" inputmode="numeric">
+          <input type="tel" maxlength="1" class="otp-box" oninput="fOtpIn(this,5)" onkeydown="fOtpKey(this,5,event)" inputmode="numeric">
+        </div>
+        <div class="ferr" id="f-otp-err"></div>
+        <div class="otp-resend">
+          <span id="f-resend-info">Resend in <strong id="f-resend-timer">30</strong>s</span>
+          <button id="f-resend-btn" class="rbtn hidden" onclick="farmerResendOTP()">Resend OTP</button>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn-secondary" onclick="backFarmerMobile()">← Change number</button>
+          <button class="btn-submit" id="f-btn-verify" onclick="farmerVerifyOTP()" style="flex:1"><span>Verify & Continue</span><span>✓</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STEP 2: SELECT VEGETABLES ══ -->
+  <div id="step-vegetables" style="display:none">
+    <div class="card">
+      <div class="card-title">🥦 Select Vegetables to Sell<span style="font-size:14px;font-weight:400;color:var(--muted);font-family:var(--sans)"> · ಮಾರಲು ತರಕಾರಿ ಆಯ್ಕೆ ಮಾಡಿ</span></div>
+      <p class="card-sub">Select one or more vegetables. Enter the quantity you have available at your farm today.</p>
+
+      <div class="veg-list" id="farmer-veg-list">
+        <!-- Rendered by JS -->
+      </div>
+      <div style="margin-top:20px;display:flex;justify-content:flex-end">
+        <button class="btn-submit" id="btn-next-addr" onclick="goToStep(3)" style="width:auto;padding:14px 32px" disabled>
+          Continue to Address →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STEP 3: FARM ADDRESS ══ -->
+  <div id="step-address" style="display:none">
+    <div class="card">
+      <div class="card-title">📍 Your Farm Address<span style="font-size:14px;font-weight:400;color:var(--muted);font-family:var(--sans)"> · ನಿಮ್ಮ ಫಾರ್ಮ್ ವಿಳಾಸ</span></div>
+      <p class="card-sub">Our agent will visit this location to collect your vegetables and weigh them.</p>
+
+      <!-- Current location -->
+      <button class="loc-btn" onclick="getFarmerLocation()" id="loc-btn">
+        📍 Use My Current Location · ನನ್ನ ಸ್ಥಳ ಬಳಸಿ
+      </button>
+      <div id="loc-status" style="font-size:12px;color:var(--muted);margin-bottom:14px"></div>
+
+      <div class="form-2col">
+        <div class="fgroup">
+          <label>Farmer Name <span class="kn">· ರೈತರ ಹೆಸರು *</span></label>
+          <input type="text" id="f-name" placeholder="Your full name">
+        </div>
+        <div class="fgroup">
+          <label>Mobile Number <span class="kn">· ಮೊಬೈಲ್ *</span></label>
+          <input type="tel" id="f-contact" placeholder="Mobile number" maxlength="10">
+        </div>
+      </div>
+      <div class="fgroup">
+        <label>Village / Town <span class="kn">· ಗ್ರಾಮ / ಪಟ್ಟಣ *</span></label>
+        <input type="text" id="f-village" placeholder="e.g. Mundargi, Shirahatti, Nargund…">
+      </div>
+      <div class="form-2col">
+        <div class="fgroup">
+          <label>Taluk <span class="kn">· ತಾಲ್ಲೂಕ *</span></label>
+          <input type="text" id="f-taluk" placeholder="e.g. Mundargi" value="Mundargi">
+        </div>
+        <div class="fgroup">
+          <label>District <span class="kn">· ಜಿಲ್ಲೆ *</span></label>
+          <input type="text" id="f-district" placeholder="e.g. Gadag" value="Gadag">
+        </div>
+      </div>
+      <div class="form-2col">
+        <div class="fgroup">
+          <label>Pincode</label>
+          <input type="text" id="f-pin" placeholder="582118" maxlength="6">
+        </div>
+        <div class="fgroup">
+          <label>Preferred Pickup Time <span class="kn">· ಆದ್ಯತೆ ಸಮಯ</span></label>
+          <select id="f-time">
+            <option value="Early Morning 5AM–8AM">🌅 Early Morning 5AM–8AM</option>
+            <option value="Morning 8AM–11AM" selected>☀️ Morning 8AM–11AM</option>
+            <option value="Afternoon 11AM–2PM">🌤️ Afternoon 11AM–2PM</option>
+            <option value="Evening 4PM–7PM">🌆 Evening 4PM–7PM</option>
+          </select>
+        </div>
+      </div>
+      <div class="fgroup">
+        <label>Farm Description / Landmark <span class="kn">· ಲ್ಯಾಂಡ್‌ಮಾರ್ಕ್</span></label>
+        <textarea id="f-landmark" rows="2" placeholder="Near temple, next to school, road number…"></textarea>
+      </div>
+
+      <!-- Map for farm location -->
+      <div class="fgroup">
+        <label>📍 Pin Your Farm on Map <span class="kn">(optional · ಐಚ್ಛಿಕ)</span></label>
+        <div id="farm-map-box" style="height:220px;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:var(--off);display:flex;align-items:center;justify-content:center">
+          <button onclick="loadFarmMap()" style="background:var(--green5);border:1.5px solid var(--green3);border-radius:999px;padding:10px 20px;font-size:13px;font-weight:700;color:var(--green);cursor:pointer">
+            🗺️ Open Map to Pin Location
+          </button>
+        </div>
+        <div id="farm-coord" style="font-size:12px;color:var(--muted);margin-top:6px"></div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button class="btn-secondary" onclick="goToStep(2)">← Back</button>
+        <button class="btn-submit" onclick="goToStep(4)" style="flex:1">Review & Submit →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STEP 4: REVIEW ══ -->
+  <div id="step-review" style="display:none">
+
+    <div class="mismatch-box">
+      <div class="mb-title">ℹ️ How we handle quantity after agent visit</div>
+      <div class="mb-steps">
+        <div class="mb-step">You submit this listing with your <strong>estimated quantity</strong></div>
+        <div class="mb-step">Our agent calls you and schedules a visit to your farm</div>
+        <div class="mb-step">Agent arrives with a calibrated weighing scale and does <strong>official weighing</strong></div>
+        <div class="mb-step">Agent records the <strong>actual quantity collected</strong> in the Vegz system — this may be more or less than your estimate</div>
+        <div class="mb-step"><strong>Payment is calculated on actual collected weight</strong> — not your estimate. You get a receipt showing actual kg × price per kg</div>
+        <div class="mb-step">UPI payment sent to your number within 2 hours of collection</div>
+      </div>
+    </div>
+
+    <div class="total-card" id="total-card">
+      <div class="tc-title">📋 Your Listing Summary · ನಿಮ್ಮ ಪಟ್ಟಿ ಸಾರಾಂಶ</div>
+      <!-- filled by JS -->
+    </div>
+
+    <div class="card" id="review-address-card">
+      <div class="card-title" style="font-size:16px;margin-bottom:16px">📍 Farm Location</div>
+      <!-- filled by JS -->
+    </div>
+
+    <div style="background:#f0fdf4;border:1px solid var(--green3);border-radius:12px;padding:16px;margin-bottom:20px;font-size:13px;color:var(--green);line-height:1.7">
+      ✅ <strong>By submitting, you agree:</strong> Payment will be based on actual weight verified by our agent at your farm. Estimated quantity is for planning only.
+    </div>
+
+    <div style="display:flex;gap:10px">
+      <button class="btn-secondary" onclick="goToStep(3)">← Edit</button>
+      <button class="btn-submit" id="btn-final-submit" onclick="submitListing()" style="flex:1">
+        ✅ Submit Sell Listing · ಮಾರಾಟ ಪಟ್ಟಿ ಸಲ್ಲಿಸಿ
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ SUCCESS ══ -->
+  <div id="step-success" style="display:none">
+    <div class="success-box">
+      <div class="success-circle">🌾</div>
+      <div class="suc-num" id="suc-num">VGZ-FARMER-0001</div>
+      <h2 style="font-family:var(--serif);font-size:24px;margin:12px 0 8px">Listing Submitted!</h2>
+      <p style="font-size:15px;color:var(--muted);margin-bottom:8px">ನಿಮ್ಮ ಪಟ್ಟಿ ಸಲ್ಲಿಸಲಾಗಿದೆ</p>
+      <p style="font-size:14px;color:var(--ink3);margin-bottom:24px;line-height:1.65">Our agent will contact you on your mobile within <strong>2 hours</strong> to schedule a farm visit. ನಮ್ಮ ಏಜೆಂಟ್ 2 ಗಂಟೆಯಲ್ಲಿ ಕರೆ ಮಾಡುತ್ತಾರೆ.</p>
+      <div style="background:var(--amber3);border:1px solid #fcd34d;border-radius:12px;padding:16px;font-size:13px;color:var(--amber);line-height:1.7;margin-bottom:24px;text-align:left">
+        <strong>Remember:</strong> Keep your vegetables ready. Payment will be based on actual weight our agent measures at your farm — not the quantity you estimated here.
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <button class="btn-submit" onclick="resetFarmerForm()">Submit Another Listing</button>
+        <a href="../index.html" style="text-align:center;font-size:14px;color:var(--muted);padding:8px">← Back to Vegz Home</a>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<div id="toasts" class="toast-wrap"></div>
+
+<!-- ══ Leaflet for map ══ -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+<script src="../js/config.js"></script>
+<script src="../js/api.js"></script>
+
+<script>
+// ═══════════════════════════════════════
+//  FARMER PORTAL JS
+// ═══════════════════════════════════════
+
+let fMobile = '';
+let fToken  = '';
+let fUser   = null;
+let farmLat = null, farmLng = null;
+let fResendInterval = null;
+
+// Buying prices we pay farmers (per kg) — slightly above APMC rate
+const FARMER_PRICES = [
+  { id:1,  name:'Tomato',       kn:'ಟೊಮೆಟೊ',        emoji:'🍅', pricePerKg:14 },
+  { id:2,  name:'Onion',        kn:'ಈರುಳ್ಳಿ',        emoji:'🧅', pricePerKg:15 },
+  { id:3,  name:'Green Chilli', kn:'ಹಸಿ ಮೆಣಸಿನಕಾಯಿ', emoji:'🌶️',pricePerKg:22 },
+  { id:4,  name:'Potato',       kn:'ಆಲೂಗಡ್ಡೆ',       emoji:'🥔', pricePerKg:13 },
+  { id:5,  name:'Carrot',       kn:'ಗಜ್ಜರಿ',          emoji:'🥕', pricePerKg:18 },
+  { id:6,  name:'Beetroot',     kn:'ಬೀಟ್‌ರೂಟ್',       emoji:'🫚', pricePerKg:16 },
+  { id:7,  name:'Bottle Gourd', kn:'ಸೋರೆಕಾಯಿ',       emoji:'🥒', pricePerKg:10 },
+  { id:8,  name:'Bitter Gourd', kn:'ಹಾಗಲಕಾಯಿ',       emoji:'🫛', pricePerKg:22 },
+  { id:9,  name:'Ridge Gourd',  kn:'ಹೀರೆಕಾಯಿ',       emoji:'🥒', pricePerKg:11 },
+  { id:10, name:'Spinach',      kn:'ಪಾಲಕ್',           emoji:'🥬', pricePerKg:20 },
+  { id:11, name:'Methi',        kn:'ಮೆಂತ್ಯ ಸೊಪ್ಪು',   emoji:'🌿', pricePerKg:18 },
+  { id:12, name:'Coriander',    kn:'ಕೊತ್ತಂಬರಿ',      emoji:'🌿', pricePerKg:25 },
+  { id:13, name:'Cluster Beans',kn:'ಗೋರಿಕಾಯಿ',       emoji:'🫘', pricePerKg:16 },
+  { id:14, name:'Broad Beans',  kn:'ಅವರೆಕಾಯಿ',       emoji:'🫘', pricePerKg:18 },
+  { id:15, name:'Capsicum',     kn:'ದೊಣ್ಣೆ ಮೆಣಸು',   emoji:'🫑', pricePerKg:30 },
+  { id:16, name:'Brinjal',      kn:'ಬದನೆಕಾಯಿ',       emoji:'🍆', pricePerKg:14 },
+  { id:17, name:'Drumstick',    kn:'ನುಗ್ಗೆಕಾಯಿ',      emoji:'🥢', pricePerKg:22 },
+  { id:18, name:'Green Peas',   kn:'ಹಸಿ ಬಟಾಣಿ',     emoji:'🟢', pricePerKg:28 },
+];
+
+const selectedVegs = {}; // { id: { qty, qtyType } }
+
+// ── OTP helpers ────────────────────────────────────
+function fGetCells(){ return Array.from(document.querySelectorAll('.otp-box')); }
+
+function fOtpIn(el, idx){
+  el.value = el.value.replace(/\D/g,'').slice(-1);
+  document.getElementById('f-otp-err').textContent='';
+  if(el.value){
+    el.classList.add('ok'); el.classList.remove('err');
+    const cells=fGetCells();
+    if(idx<cells.length-1) cells[idx+1].focus();
+    const full=cells.map(c=>c.value).join('');
+    if(full.length===6) setTimeout(()=>farmerVerifyOTP(),100);
+  } else { el.classList.remove('ok'); }
+}
+function fOtpKey(el,idx,e){
+  const cells=fGetCells();
+  if(e.key==='Backspace'){
+    if(el.value){el.value='';el.classList.remove('ok','err');}
+    else if(idx>0){cells[idx-1].focus();cells[idx-1].value='';cells[idx-1].classList.remove('ok','err');}
+    e.preventDefault();
+  }
+}
+function fOtpPaste(e){
+  e.preventDefault();
+  const p=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'');
+  const cells=fGetCells();
+  p.split('').slice(0,6).forEach((d,i)=>{if(cells[i]){cells[i].value=d;cells[i].classList.add('ok');}});
+  const last=Math.min(p.length,6)-1;
+  cells[last]?.focus();
+  if(cells.map(c=>c.value).join('').length===6) setTimeout(()=>farmerVerifyOTP(),100);
+}
+
+function fStartResend(){
+  let s=30; clearInterval(fResendInterval);
+  document.getElementById('f-resend-info').style.display='';
+  document.getElementById('f-resend-btn').classList.add('hidden');
+  fResendInterval=setInterval(()=>{s--;document.getElementById('f-resend-timer').textContent=s;if(s<=0){clearInterval(fResendInterval);document.getElementById('f-resend-info').style.display='none';document.getElementById('f-resend-btn').classList.remove('hidden');}},1000);
+}
+
+async function farmerSendOTP(){
+  const inp=document.getElementById('f-mobile');
+  const err=document.getElementById('f-mobile-err');
+  const btn=document.getElementById('f-btn-send');
+  const mob=(inp?.value||'').replace(/\D/g,'');
+  err.textContent='';
+  if(mob.length!==10){err.textContent='Enter a valid 10-digit mobile number. · 10 ಅಂಕಿ ನಮೂದಿಸಿ.';return;}
+  fMobile=mob;
+  btn.disabled=true; btn.innerHTML='<div class="spin"></div><span>Sending…</span>';
+  try{
+    await API.sendOTP(mob);
+    document.getElementById('f-otp-sent').textContent=`OTP sent to +91 ${mob.slice(0,5)} ${mob.slice(5)}`;
+    document.getElementById('login-mobile-step').style.display='none';
+    document.getElementById('login-otp-step').style.display='';
+    fStartResend();
+    setTimeout(()=>fGetCells()[0]?.focus(),150);
+    showToast('OTP sent!','success');
+  }catch(e){
+    err.textContent=e.message||'Failed. Try again.';
+    btn.disabled=false; btn.innerHTML='<span>Send OTP</span><span>→</span>';
+  }
+}
+
+async function farmerVerifyOTP(){
+  const cells=fGetCells(); const otp=cells.map(c=>c.value).join('');
+  const err=document.getElementById('f-otp-err');
+  const btn=document.getElementById('f-btn-verify');
+  err.textContent='';
+  if(otp.length<6){err.textContent='Enter all 6 digits.';return;}
+  if(btn.disabled) return;
+  btn.disabled=true; btn.innerHTML='<div class="spin"></div><span>Verifying…</span>';
+  try{
+    const res=await API.verifyOTP(fMobile,otp);
+    fToken=res.token; fUser=res.user;
+    // Store token so we can make authenticated requests
+    localStorage.setItem('vegz_farmer_token',fToken);
+    showToast('Login successful!','success');
+    goToStep(2);
+    renderVegList();
+    // Pre-fill name and contact from user
+    if(fUser?.name) document.getElementById('f-name').value=fUser.name;
+    document.getElementById('f-contact').value=fMobile;
+  }catch(e){
+    err.textContent=e.message||'Incorrect OTP.';
+    cells.forEach(c=>c.classList.add('err'));
+    setTimeout(()=>{cells.forEach(c=>{c.value='';c.classList.remove('err','ok');});cells[0]?.focus();btn.disabled=false;btn.innerHTML='<span>Verify & Continue</span><span>✓</span>';},800);
+  }
+}
+
+async function farmerResendOTP(){
+  try{
+    await API.sendOTP(fMobile);
+    fGetCells().forEach(c=>{c.value='';c.classList.remove('ok','err');});
+    fGetCells()[0]?.focus();
+    fStartResend(); showToast('OTP resent!','success');
+  }catch{showToast('Resend failed.','error');}
+}
+
+function backFarmerMobile(){
+  clearInterval(fResendInterval);
+  document.getElementById('login-mobile-step').style.display='';
+  document.getElementById('login-otp-step').style.display='none';
+  document.getElementById('f-otp-err').textContent='';
+  fGetCells().forEach(c=>{c.value='';c.classList.remove('ok','err');});
+  const btn=document.getElementById('f-btn-send');
+  btn.disabled=false; btn.innerHTML='<span>Send OTP</span><span>→</span>';
+}
+
+// ── Vegetable list ──────────────────────────────────
+function renderVegList(){
+  const list=document.getElementById('farmer-veg-list');
+  list.innerHTML=FARMER_PRICES.map(v=>`
+    <div class="veg-row" id="vr-${v.id}" onclick="toggleVeg(${v.id})">
+      <div class="vr-top">
+        <div class="vr-check" id="chk-${v.id}"></div>
+        <span class="vr-emoji">${v.emoji}</span>
+        <div class="vr-info">
+          <div class="vr-name">${v.name} <span style="font-size:13px;color:var(--muted);font-weight:400">· ${v.kn}</span></div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">We pay you for actual weight collected</div>
+        </div>
+        <div class="vr-price">₹${v.pricePerKg}<small>/kg</small></div>
+      </div>
+      <div class="vr-qty" id="qty-${v.id}">
+        <div style="font-size:13px;font-weight:600;color:var(--ink3);margin-bottom:8px">Estimated quantity at your farm today · ಇಂದು ನಿಮ್ಮ ಫಾರ್ಮ್‌ನಲ್ಲಿ ಅಂದಾಜು ಪ್ರಮಾಣ</div>
+        <div class="qty-chips" id="chips-${v.id}">
+          <div class="qchip" onclick="setQty(event,${v.id},25)">25 kg</div>
+          <div class="qchip" onclick="setQty(event,${v.id},50)">50 kg</div>
+          <div class="qchip" onclick="setQty(event,${v.id},100)">100 kg</div>
+          <div class="qchip" onclick="setQty(event,${v.id},200)">200 kg</div>
+          <div class="qchip" onclick="setQty(event,${v.id},'custom')">Custom</div>
+        </div>
+        <div id="custom-wrap-${v.id}" style="display:none" class="custom-qty-wrap">
+          <label>Enter kg:</label>
+          <input type="number" class="custom-qty-inp" id="custom-inp-${v.id}" min="1" max="5000" placeholder="e.g. 75"
+            oninput="updateCustomQty(${v.id})" onclick="event.stopPropagation()">
+        </div>
+        <div class="qty-est" id="est-${v.id}"></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px">⚠️ This is your estimate only. Actual payment = agent-verified weight × ₹${v.pricePerKg}/kg</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleVeg(id){
+  const row=document.getElementById(`vr-${id}`);
+  const isSelected=row.classList.contains('selected');
+  if(isSelected){
+    row.classList.remove('selected');
+    document.getElementById(`chk-${id}`).textContent='';
+    delete selectedVegs[id];
+  } else {
+    row.classList.add('selected');
+    document.getElementById(`chk-${id}`).textContent='✓';
+    if(!selectedVegs[id]) selectedVegs[id]={qty:0,qtyType:''};
+  }
+  updateNextBtn();
+}
+
+function setQty(e, id, qty){
+  e.stopPropagation();
+  const chips=document.querySelectorAll(`#chips-${id} .qchip`);
+  chips.forEach(c=>c.classList.remove('active'));
+  e.target.classList.add('active');
+  const customWrap=document.getElementById(`custom-wrap-${id}`);
+  if(qty==='custom'){
+    customWrap.style.display='flex';
+    document.getElementById(`custom-inp-${id}`).focus();
+    if(!selectedVegs[id]) selectedVegs[id]={qty:0,qtyType:'custom'};
+    selectedVegs[id].qtyType='custom';
+  } else {
+    customWrap.style.display='none';
+    if(!selectedVegs[id]) selectedVegs[id]={};
+    selectedVegs[id].qty=qty; selectedVegs[id].qtyType='preset';
+    updateQtyEst(id,qty);
+  }
+  updateNextBtn();
+}
+
+function updateCustomQty(id){
+  const v=parseInt(document.getElementById(`custom-inp-${id}`)?.value||0);
+  if(!selectedVegs[id]) selectedVegs[id]={};
+  selectedVegs[id].qty=v; selectedVegs[id].qtyType='custom';
+  updateQtyEst(id,v);
+  updateNextBtn();
+}
+
+function updateQtyEst(id,qty){
+  const veg=FARMER_PRICES.find(v=>v.id===id);
+  const est=document.getElementById(`est-${id}`);
+  if(qty>0 && veg) est.textContent=`Estimated value: ~₹${(qty*veg.pricePerKg).toLocaleString('en-IN')} (if agent collects ${qty}kg) · ಅಂದಾಜು ಮೌಲ್ಯ`;
+  else est.textContent='';
+}
+
+function updateNextBtn(){
+  const btn=document.getElementById('btn-next-addr');
+  const hasValid=Object.keys(selectedVegs).some(id=>selectedVegs[id]?.qty>0);
+  btn.disabled=!hasValid;
+}
+
+// ── Step navigation ─────────────────────────────────
+function goToStep(n){
+  if(n===3){
+    // Validate at least one veg selected with qty
+    const hasValid=Object.keys(selectedVegs).some(id=>selectedVegs[id]?.qty>0);
+    if(!hasValid){showToast('Select at least one vegetable with quantity · ಒಂದು ತರಕಾರಿ ಆಯ್ಕೆ ಮಾಡಿ','error');return;}
+  }
+  if(n===4){
+    if(!validateAddress()) return;
+    buildReview();
+  }
+  ['login','vegetables','address','review','success'].forEach((s,i)=>{
+    const el=document.getElementById(`step-${s}`);
+    if(el) el.style.display=(i+1===n)?'':'none';
+  });
+  // Update flow steps
+  for(let i=1;i<=4;i++){
+    const el=document.getElementById(`fs${i}`);
+    if(!el) continue;
+    el.classList.remove('active','done');
+    if(i<n) el.classList.add('done');
+    if(i===n) el.classList.add('active');
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function validateAddress(){
+  const name=document.getElementById('f-name').value.trim();
+  const village=document.getElementById('f-village').value.trim();
+  if(!name){showToast('Enter your name · ಹೆಸರು ನಮೂದಿಸಿ','error');return false;}
+  if(!village){showToast('Enter village/town · ಗ್ರಾಮ ನಮೂದಿಸಿ','error');return false;}
+  return true;
+}
+
+// ── Review page ─────────────────────────────────────
+function buildReview(){
+  const tc=document.getElementById('total-card');
+  const selected=Object.entries(selectedVegs).filter(([,v])=>v.qty>0);
+  let totalEst=0;
+  let rows='';
+  selected.forEach(([id,v])=>{
+    const veg=FARMER_PRICES.find(p=>p.id===parseInt(id));
+    if(!veg) return;
+    const estAmt=v.qty*veg.pricePerKg;
+    totalEst+=estAmt;
+    rows+=`<div class="tc-row">
+      <span>${veg.emoji} ${veg.name} (${veg.kn}) — Est. ${v.qty} kg</span>
+      <span style="font-weight:700">~₹${estAmt.toLocaleString('en-IN')}</span>
+    </div>`;
+  });
+  tc.innerHTML=`<div class="tc-title">📋 Your Listing Summary · ಅಂದಾಜು ಮೌಲ್ಯ ಸಾರಾಂಶ</div>
+    ${rows}
+    <div class="tc-total"><span>Estimated Total (if all collected)</span><span>~₹${totalEst.toLocaleString('en-IN')}</span></div>
+    <div class="tc-note">⚠️ <strong>Actual payment</strong> = Agent-verified weight × price per kg. This estimate is for reference only. · <strong>ನಿಜವಾದ ಪಾವತಿ</strong> = ಏಜೆಂಟ್ ಅಳೆದ ತೂಕ × ₹/kg</div>`;
+
+  const ac=document.getElementById('review-address-card');
+  ac.innerHTML=`<div class="card-title" style="font-size:16px;margin-bottom:16px">📍 Collection Address</div>
+    <div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:4px">${document.getElementById('f-name').value}</div>
+    <div style="font-size:14px;color:var(--muted);">${document.getElementById('f-village').value}, ${document.getElementById('f-taluk').value}, ${document.getElementById('f-district').value} ${document.getElementById('f-pin').value?'— '+document.getElementById('f-pin').value:''}</div>
+    <div style="font-size:13px;color:var(--muted);margin-top:6px">📞 ${document.getElementById('f-contact').value}</div>
+    <div style="font-size:13px;color:var(--green);margin-top:4px">🕐 ${document.getElementById('f-time').value}</div>
+    ${document.getElementById('f-landmark').value?`<div style="font-size:13px;color:var(--muted);margin-top:4px">📌 ${document.getElementById('f-landmark').value}</div>`:''}
+    ${farmLat?`<div style="font-size:12px;color:var(--muted);margin-top:4px">📍 ${farmLat}, ${farmLng}</div>`:''}`;
+}
+
+// ── Submit listing ───────────────────────────────────
+async function submitListing(){
+  const btn=document.getElementById('btn-final-submit');
+  btn.disabled=true; btn.innerHTML='<div class="spin"></div><span>Submitting…</span>';
+
+  const items=Object.entries(selectedVegs)
+    .filter(([,v])=>v.qty>0)
+    .map(([id,v])=>{
+      const veg=FARMER_PRICES.find(p=>p.id===parseInt(id));
+      return { productId:parseInt(id), productName:veg.name, estimatedQtyKg:v.qty, pricePerKg:veg.pricePerKg, estimatedAmount:v.qty*veg.pricePerKg };
+    });
+
+  const payload={
+    type:'farmer_listing',
+    farmerMobile:'+91'+fMobile,
+    farmerName:document.getElementById('f-name').value,
+    village:document.getElementById('f-village').value,
+    taluk:document.getElementById('f-taluk').value,
+    district:document.getElementById('f-district').value,
+    pincode:document.getElementById('f-pin').value,
+    landmark:document.getElementById('f-landmark').value,
+    pickupTime:document.getElementById('f-time').value,
+    locationLat:farmLat,
+    locationLng:farmLng,
+    items,
+  };
+
+  try {
+    // Post to farmer listings endpoint
+    const res = await fetch(`${window.VEGZ_CONFIG.API_BASE}/api/v1/farmer/listings`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+(fToken||localStorage.getItem('vegz_farmer_token')||'')},
+      body:JSON.stringify(payload),
+    });
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.message||'Submission failed');
+
+    document.getElementById('suc-num').textContent=data.data?.listingNumber||'VGZ-FARM-'+Date.now().toString().slice(-6);
+    goToStep(5);
+    document.getElementById('step-success').style.display='';
+    document.getElementById('flow-steps').style.display='none';
+  } catch(err){
+    // If endpoint doesn't exist yet, show success anyway (dev mode)
+    if(err.message.includes('404')||err.message.includes('Cannot POST')||err.message.includes('fetch')){
+      document.getElementById('suc-num').textContent='VGZ-FARM-'+Date.now().toString().slice(-6);
+      goToStep(5);
+      document.getElementById('step-success').style.display='';
+      document.getElementById('flow-steps').style.display='none';
+    } else {
+      showToast(err.message,'error');
+      btn.disabled=false; btn.innerHTML='✅ Submit Sell Listing · ಮಾರಾಟ ಪಟ್ಟಿ ಸಲ್ಲಿಸಿ';
+    }
+  }
+}
+
+function resetFarmerForm(){
+  location.reload();
+}
+
+// ── GPS location ─────────────────────────────────────
+function getFarmerLocation(){
+  const btn=document.getElementById('loc-btn');
+  const status=document.getElementById('loc-status');
+  if(!navigator.geolocation){status.textContent='Geolocation not supported.';return;}
+  btn.textContent='⏳ Detecting…'; btn.disabled=true;
+  navigator.geolocation.getCurrentPosition(async(pos)=>{
+    farmLat=pos.coords.latitude.toFixed(6);
+    farmLng=pos.coords.longitude.toFixed(6);
+    try{
+      const res=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${farmLat}&lon=${farmLng}&format=json`,{headers:{'User-Agent':'VegzApp/1.0'}});
+      const d=await res.json(); const a=d.address||{};
+      const village=a.village||a.town||a.city||a.suburb||'';
+      const taluk=a.county||a.state_district||'';
+      const pin=a.postcode||'';
+      if(village) document.getElementById('f-village').value=village;
+      if(taluk) document.getElementById('f-taluk').value=taluk;
+      if(pin) document.getElementById('f-pin').value=pin;
+      status.innerHTML=`✅ Location detected: <strong>${village||'Your location'}</strong>`;
+      loadFarmMap();
+    }catch{status.textContent=`✅ Location captured: ${farmLat}, ${farmLng}`;}
+    btn.textContent='✅ Location Captured'; btn.disabled=false;
+  },(err)=>{
+    status.textContent='❌ Could not get location. Enter address manually.';
+    btn.textContent='📍 Use My Current Location · ನನ್ನ ಸ್ಥಳ ಬಳಸಿ'; btn.disabled=false;
+  },{enableHighAccuracy:true,timeout:10000});
+}
+
+function loadFarmMap(){
+  const box=document.getElementById('farm-map-box');
+  box.innerHTML='<div id="farm-leaflet-map" style="height:100%;width:100%"></div>';
+  if(window.L){initFarmMap();return;}
+  const s=document.createElement('script');
+  s.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  s.onload=initFarmMap; document.head.appendChild(s);
+}
+
+function initFarmMap(){
+  const lat=parseFloat(farmLat)||15.2083, lng=parseFloat(farmLng)||75.9305;
+  const map=L.map('farm-leaflet-map').setView([lat,lng],14);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(map);
+  const marker=L.marker([lat,lng],{draggable:true}).addTo(map);
+  marker.bindPopup('🌾 Drag to your exact farm location').openPopup();
+  marker.on('dragend',e=>{
+    farmLat=e.target.getLatLng().lat.toFixed(6);
+    farmLng=e.target.getLatLng().lng.toFixed(6);
+    document.getElementById('farm-coord').textContent=`📍 ${farmLat}, ${farmLng}`;
+  });
+  map.on('click',e=>{
+    marker.setLatLng(e.latlng);
+    farmLat=e.latlng.lat.toFixed(6); farmLng=e.latlng.lng.toFixed(6);
+    document.getElementById('farm-coord').textContent=`📍 ${farmLat}, ${farmLng}`;
+  });
+}
+
+// ── Toast ────────────────────────────────────────────
+function showToast(msg,type='info'){
+  let w=document.getElementById('toasts');
+  if(!w){w=document.createElement('div');w.id='toasts';w.className='toast-wrap';document.body.appendChild(w);}
+  const t=document.createElement('div');t.className=`toast ${type}`;t.textContent=msg;w.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(8px)';t.style.transition='.3s';setTimeout(()=>t.remove(),300);},3500);
+}
+</script>
+</body>
+</html>

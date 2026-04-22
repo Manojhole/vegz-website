@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop — Vegz | Order Fresh Vegetables | North Karnataka</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="../css/main.css">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="shop-body">
+
+<!-- NAVBAR -->
+<header class="header" id="header">
+  <div class="header-inner">
+    <a href="../index.html" class="logo">
+      <span class="logo-mark">🌿</span>
+      <span class="logo-text">VEGZ</span>
+    </a>
+    <div class="header-actions" style="margin-left:auto;gap:12px">
+      <a href="orders.html" style="font-size:14px;font-weight:600;color:var(--ink3)">My Orders</a>
+      <a href="profile.html" id="nav-name" style="font-size:14px;font-weight:600;color:var(--ink3)">Profile</a>
+      <button onclick="logout()" class="btn-secondary" style="font-size:13px;padding:6px 16px">Logout</button>
+    </div>
+  </div>
+</header>
+
+<!-- SHOP TOP BAR -->
+<div class="shop-topbar">
+  <div class="shop-topbar-inner">
+    <div class="greeting" id="greeting"></div>
+    <div class="search-wrap">
+      <i data-lucide="search" class="search-icon"></i>
+      <input type="text" id="search-inp" placeholder="Search vegetables…" oninput="doFilter()">
+    </div>
+    <div class="cart-trigger" onclick="openCart()">
+      <i data-lucide="shopping-cart" style="width:18px;height:18px"></i>
+      Cart
+      <div class="cart-trigger-badge" id="ct-badge">0</div>
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORY TABS -->
+<div class="cat-bar">
+  <div class="cat-bar-inner" id="cat-bar-inner">
+    <button class="ctab active" onclick="filterCat(0,this)">All</button>
+  </div>
+</div>
+
+<!-- PRODUCTS -->
+<div class="shop-main">
+  <div class="prod-meta" id="prod-meta">Loading…</div>
+  <div class="prod-grid" id="prod-grid">
+    <div class="prod-empty">
+      <span>🥦</span><p>Loading fresh vegetables…</p>
+    </div>
+  </div>
+</div>
+
+<!-- FLOATING CART BAR -->
+<div class="float-cart" id="float-cart" onclick="openCart()">
+  <div class="fc-badge" id="fc-badge">0</div>
+  <div class="fc-label">View Cart</div>
+  <div class="fc-amount" id="fc-amount">₹0</div>
+  <i data-lucide="arrow-right" style="color:rgba(255,255,255,.8);width:18px;height:18px"></i>
+</div>
+
+<!-- CART DRAWER -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCartOutside(event)">
+  <div class="cart-drawer">
+    <div class="cd-header">
+      <h3>🛒 My Cart</h3>
+      <div class="cd-close" onclick="closeCart()">
+        <i data-lucide="x" style="width:16px;height:16px"></i>
+      </div>
+    </div>
+    <div class="cd-items" id="cd-items">
+      <div class="cd-empty"><span>🛒</span><p>Cart is empty</p><small>Add vegetables to get started</small></div>
+    </div>
+    <div class="cd-footer" id="cd-footer" style="display:none">
+      <div class="bill-row"><span>Items total</span><span id="cd-sub">₹0</span></div>
+      <div class="bill-row"><span>Delivery</span><span style="color:var(--g600);font-weight:700">FREE</span></div>
+      <div class="bill-total-row"><span>Total</span><span id="cd-total">₹0</span></div>
+      <button class="btn-checkout-go" onclick="goCheckout()">
+        <i data-lucide="arrow-right" style="width:16px;height:16px"></i>
+        Proceed to Checkout
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="toasts" class="toast-wrap"></div>
+
+<script src="../js/config.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script>
+lucide.createIcons();
+
+// Auth guard
+if (!requireAuth()) { /* redirected */ }
+
+// ── State ─────────────────────────────────────
+let allProds = [], activeCat = 0;
+let cart = JSON.parse(sessionStorage.getItem('vegz_cart') || '[]');
+const selOpts = {}; // productId → optionId
+
+// ── Init ──────────────────────────────────────
+async function init() {
+  const user = getUser();
+  const hr   = new Date().getHours();
+  const greet= hr<12 ? 'Good morning' : hr<17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('greeting').textContent = `${greet}, ${user?.name?.split(' ')[0] || 'there'} 👋`;
+  if (user?.name) document.getElementById('nav-name').textContent = user.name.split(' ')[0];
+
+  try {
+    const [catRes, prodRes] = await Promise.all([API.getCategories(), API.getProducts()]);
+    const cats = catRes.data || [];
+    allProds   = prodRes.data || [];
+    buildCatTabs(cats);
+    renderProds(allProds);
+    updateCartUI();
+  } catch (err) {
+    document.getElementById('prod-grid').innerHTML = `
+      <div class="prod-empty">
+        <span>⚠️</span>
+        <p style="color:var(--r600)">${err.message}</p>
+        <button onclick="init()" class="btn-primary" style="margin-top:16px">Retry</button>
+      </div>`;
+  }
+}
+
+// ── Category tabs ─────────────────────────────
+function buildCatTabs(cats) {
+  const bar = document.getElementById('cat-bar-inner');
+  bar.innerHTML = '<button class="ctab active" onclick="filterCat(0,this)">All</button>';
+  cats.forEach(c => {
+    const b = document.createElement('button');
+    b.className = 'ctab';
+    b.textContent = c.name;
+    b.onclick = () => filterCat(c.id, b);
+    bar.appendChild(b);
+  });
+}
+
+function filterCat(id, btn) {
+  activeCat = id;
+  document.querySelectorAll('.ctab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function doFilter() { applyFilters(); }
+
+function applyFilters() {
+  const q = (document.getElementById('search-inp')?.value || '').toLowerCase();
+  const filtered = allProds.filter(p => {
+    const cat = !activeCat || p.categoryId === activeCat;
+    const srch= !q || p.name.toLowerCase().includes(q) || (p.nameKannada||'').includes(q);
+    return cat && srch;
+  });
+  renderProds(filtered);
+  filtered.forEach(p => { if (selOpts[p.id]) setQtyPill(p.id, selOpts[p.id]); });
+}
+
+// ── Render products ───────────────────────────
+function renderProds(prods) {
+  const grid = document.getElementById('prod-grid');
+  document.getElementById('prod-meta').textContent = `${prods.length} item${prods.length!==1?'s':''} available`;
+
+  if (!prods.length) {
+    grid.innerHTML = `<div class="prod-empty"><span>🔍</span><p>No vegetables found</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = prods.map(p => prodCard(p)).join('');
+
+  // set default selected option for each card
+  prods.forEach(p => {
+    const optId = selOpts[p.id] || p.quantityOptions?.[0]?.id;
+    if (optId) selectOpt(p.id, optId, false);
+  });
+}
+
+function prodCard(p) {
+  const emoji  = vegEmoji(p.name);
+  const opts   = p.quantityOptions || [];
+  const first  = opts[0];
+
+  return `
+  <div class="pcard" id="pc-${p.id}">
+    <div class="pcard-img">
+      ${p.imageUrl
+        ? `<img src="${p.imageUrl}" alt="${p.name}" loading="lazy">`
+        : `<span>${emoji}</span>`}
+      ${!p.isAvailable ? `<div class="unavail-badge">Out of Stock</div>` : ''}
+    </div>
+    <div class="pcard-body">
+      <div class="pcard-name">${p.name}</div>
+      <div class="pcard-kn">${p.nameKannada||''}</div>
+      <div class="qty-pills" id="pills-${p.id}">
+        ${opts.map((o,i) => `
+          <button class="qpill${i===0?' sel':''}" id="pill-${p.id}-${o.id}"
+            onclick="selectOpt(${p.id},${o.id},true)">${o.label}</button>
+        `).join('')}
+      </div>
+      <div class="pcard-foot">
+        <div>
+          <div class="pcard-price" id="price-${p.id}">₹${first?.price?.toLocaleString('en-IN')||'—'}</div>
+          <div class="pcard-price-sub" id="per-${p.id}">${first?.label||''}</div>
+        </div>
+        <div id="ctrl-${p.id}">
+          ${p.isAvailable ? renderAddBtn(p.id) : '<span style="font-size:11px;color:var(--r600)">Unavailable</span>'}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderAddBtn(pid) {
+  const key = cartKey(pid);
+  const item = cart.find(i => i.k === key);
+  if (item?.qty > 0) {
+    return `<div class="qty-ctrl">
+      <div class="qbtn" onclick="decQty('${key}')">−</div>
+      <div class="qnum">${item.qty}</div>
+      <div class="qbtn" onclick="incQty('${key}')">+</div>
+    </div>`;
+  }
+  return `<button class="add-btn" onclick="addItem(${pid})">+ Add</button>`;
+}
+
+// ── Option selection ──────────────────────────
+function selectOpt(pid, optId, userClick = true) {
+  selOpts[pid] = optId;
+  setQtyPill(pid, optId);
+  const p   = allProds.find(p => p.id === pid);
+  const opt = p?.quantityOptions?.find(o => o.id === optId);
+  if (opt) {
+    const pe = document.getElementById(`price-${pid}`);
+    const pp = document.getElementById(`per-${pid}`);
+    if (pe) pe.textContent = `₹${opt.price.toLocaleString('en-IN')}`;
+    if (pp) pp.textContent = opt.label;
+  }
+  // if item already in cart with this product, update option
+  if (userClick) refreshCtrl(pid);
+}
+
+function setQtyPill(pid, optId) {
+  document.querySelectorAll(`#pills-${pid} .qpill`).forEach(b => {
+    b.classList.toggle('sel', b.id === `pill-${pid}-${optId}`);
+  });
+}
+
+function cartKey(pid) {
+  const optId = selOpts[pid] || allProds.find(p=>p.id===pid)?.quantityOptions?.[0]?.id;
+  return `${pid}_${optId}`;
+}
+
+// ── Cart operations ───────────────────────────
+function addItem(pid) {
+  const prod = allProds.find(p => p.id === pid);
+  if (!prod) return;
+  const optId = selOpts[pid] || prod.quantityOptions?.[0]?.id;
+  const opt   = prod.quantityOptions?.find(o => o.id === optId);
+  if (!opt) return;
+  const k  = `${pid}_${optId}`;
+  const idx= cart.findIndex(i => i.k === k);
+  if (idx >= 0) cart[idx].qty++;
+  else cart.push({ k, pid, optId, prod, opt, qty:1 });
+  saveCart(); updateCartUI(); refreshCtrl(pid);
+  toast(`${prod.name} added ✓`, 'success');
+}
+
+function incQty(k) {
+  const i = cart.findIndex(c => c.k === k);
+  if (i>=0) { cart[i].qty++; saveCart(); updateCartUI(); refreshCtrl(cart[i].pid); }
+}
+
+function decQty(k) {
+  const i = cart.findIndex(c => c.k === k);
+  if (i>=0) {
+    cart[i].qty--;
+    if (cart[i].qty <= 0) { const pid=cart[i].pid; cart.splice(i,1); saveCart(); updateCartUI(); refreshCtrl(pid); }
+    else { saveCart(); updateCartUI(); refreshCtrl(cart[i].pid); }
+  }
+}
+
+function refreshCtrl(pid) {
+  const el = document.getElementById(`ctrl-${pid}`);
+  if (el) el.innerHTML = renderAddBtn(pid);
+}
+
+function saveCart() { sessionStorage.setItem('vegz_cart', JSON.stringify(cart)); }
+
+// ── Cart UI ───────────────────────────────────
+function updateCartUI() {
+  const total = cart.reduce((s,i) => s + i.opt.price*i.qty, 0);
+  const count = cart.reduce((s,i) => s + i.qty, 0);
+
+  // Float bar
+  const fb = document.getElementById('float-cart');
+  if (count > 0) fb?.classList.add('vis'); else fb?.classList.remove('vis');
+  const fcb = document.getElementById('fc-badge');
+  const fca = document.getElementById('fc-amount');
+  const ctb = document.getElementById('ct-badge');
+  if (fcb) fcb.textContent = count;
+  if (fca) fca.textContent = `₹${total.toLocaleString('en-IN')}`;
+  if (ctb) ctb.textContent = count;
+
+  renderDrawer();
+}
+
+function renderDrawer() {
+  const items  = document.getElementById('cd-items');
+  const footer = document.getElementById('cd-footer');
+  const total  = cart.reduce((s,i) => s + i.opt.price*i.qty, 0);
+
+  if (!cart.length) {
+    items.innerHTML = '<div class="cd-empty"><span>🛒</span><p>Cart is empty</p><small>Add vegetables to get started</small></div>';
+    if (footer) footer.style.display = 'none';
+    return;
+  }
+
+  if (footer) {
+    footer.style.display = '';
+    document.getElementById('cd-sub').textContent   = `₹${total.toLocaleString('en-IN')}`;
+    document.getElementById('cd-total').textContent = `₹${total.toLocaleString('en-IN')}`;
+  }
+
+  items.innerHTML = cart.map(i => `
+    <div class="cd-item">
+      <div class="cd-emoji">${vegEmoji(i.prod.name)}</div>
+      <div class="cd-info">
+        <div class="cd-iname">${i.prod.name}</div>
+        <div class="cd-iopt">${i.opt.label} × ${i.qty}</div>
+      </div>
+      <div class="cd-right">
+        <div class="cd-itotal">₹${(i.opt.price*i.qty).toLocaleString('en-IN')}</div>
+        <div class="qty-ctrl" style="margin-top:6px;border-color:var(--g2)">
+          <div class="qbtn" style="background:var(--g1);color:var(--ink3)" onclick="decQty('${i.k}');renderDrawer()">−</div>
+          <div class="qnum" style="color:var(--ink)">${i.qty}</div>
+          <div class="qbtn" style="background:var(--g1);color:var(--ink3)" onclick="incQty('${i.k}');renderDrawer()">+</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Cart drawer ───────────────────────────────
+function openCart() {
+  document.getElementById('cart-overlay')?.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  renderDrawer();
+}
+function closeCart() {
+  document.getElementById('cart-overlay')?.classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeCartOutside(e) { if (e.target.id==='cart-overlay') closeCart(); }
+
+function goCheckout() {
+  if (!cart.length) { toast('Cart is empty','error'); return; }
+  closeCart();
+  window.location.href = 'checkout.html';
+}
+
+// ── Emoji helper ──────────────────────────────
+function vegEmoji(name) {
+  const n = name.toLowerCase();
+  const m = { tomato:'🍅',onion:'🧅',potato:'🥔',carrot:'🥕',spinach:'🥬',coriander:'🌿',fenugreek:'🌿',methi:'🌿',capsicum:'🫑',brinjal:'🍆',beetroot:'🩺','green chilli':'🌶️','bottle gourd':'🥒','bitter gourd':'🫛','ridge gourd':'🥒','cluster beans':'🫘','broad beans':'🫘','green peas':'🟢',drumstick:'🥢' };
+  for (const k of Object.keys(m)) { if (n.includes(k)) return m[k]; }
+  return '🥦';
+}
+
+document.addEventListener('keydown', e => { if (e.key==='Escape') closeCart(); });
+init();
+</script>
+</body>
+</html>
